@@ -134,8 +134,7 @@ function changeSources {
 }
 
 function changeGrub {
-	echo "GRUB_HIDDEN_TIMEOUT=0" | tee -a /etc/default/grub
-	echo "GRUB_HIDDEN_TIMEOUT_QUIET=true" | tee -a /etc/default/grub
+	sed -i 's/GRUB_TIMEOUT=./GRUB_TIMEOUT=0/g' /etc/default/grub
 	update-grub
 }
 
@@ -178,7 +177,7 @@ function smBusFix {
 function installZabbixProxy {
 	apt install zabbix-proxy-sqlite3 -yq
 	zcat /usr/share/doc/zabbix-proxy-sqlite3/schema.sql.gz | sqlite3 /tmp/zabbix.db
-	sudo su beheer -c "echo \"${input_zabbix_psk^}\" | tee /home/beheer/zabbix_proxy.psk"
+	sudo su beheer -c "echo \"${input_zabbix_psk}\" | tee /home/beheer/zabbix_proxy.psk"
 	AgentName=$(hostname)_Zabbix
 	echo "Server=zabbix.wijzijnde.it" | tee /etc/zabbix/zabbix_proxy.conf
 	echo "Hostname=${AgentName^}" | tee -a /etc/zabbix/zabbix_proxy.conf
