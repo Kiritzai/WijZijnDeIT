@@ -9,8 +9,7 @@
 #
 ############################
 
-# OpenVPN will not install by default
-openvpnInstall=0
+
 
 if [[ "$EUID" -ne 0 ]]; then
 	echo "Sorry, you need to run this as root"
@@ -38,6 +37,10 @@ echo "##"
 echo "####################################"
 echo
 read openvpnInstall < /dev/tty
+if [ -z $openvpnInstall ]; then
+	# OpenVPN will not install by default
+	openvpnInstall=0
+fi
 
 if [ $openvpnInstall -eq 1 ]; then
 	clear
@@ -139,6 +142,7 @@ function setSudo {
 }
 
 function changeMotd {
+	rm -r /etc/update-motd.d/10-uname
 	sed -i "s/#PrintLastLog yes/PrintLastLog no/g" /etc/ssh/sshd_config
 	echo "###########################################" | tee /etc/motd
 	echo "###" | tee -a /etc/motd
