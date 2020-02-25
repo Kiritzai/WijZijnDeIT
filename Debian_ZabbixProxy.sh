@@ -124,7 +124,7 @@ function changeSources {
 	apt install --reinstall dpkg libc-bin -yq
 	wget https://repo.zabbix.com/zabbix/4.4/debian/pool/main/z/zabbix-release/zabbix-release_4.4-1+buster_all.deb
 	dpkg -i zabbix-release_4.4-1+buster_all.deb
-	
+	apt update
 	apt upgrade -yq
 	apt autoremove -yq
 }
