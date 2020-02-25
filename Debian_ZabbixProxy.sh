@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # curl -sSL http://10.30.36.3/Debian_ZabbixProxy.sh | bash
+# curl -sSL https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/Debian_ZabbixProxy.sh | bash
 
 ############################
 #
@@ -119,9 +120,11 @@ function changeSources {
 	echo "deb-src http://security.debian.org/debian-security stable/updates contrib main non-free" | tee -a /etc/apt/sources.list
 	echo "deb http://ftp.debian.org/debian/ stable-updates contrib main non-free" | tee -a /etc/apt/sources.list
 	echo "deb-src http://ftp.debian.org/debian/ stable-updates contrib main non-free" | tee -a /etc/apt/sources.list
+	apt update
+	apt install --reinstall dpkg libc-bin -yq
 	wget https://repo.zabbix.com/zabbix/4.4/debian/pool/main/z/zabbix-release/zabbix-release_4.4-1+buster_all.deb
 	dpkg -i zabbix-release_4.4-1+buster_all.deb
-	apt update
+	
 	apt upgrade -yq
 	apt autoremove -yq
 }
@@ -132,7 +135,7 @@ function installSudo {
 }
 
 function setSudo {
-	echo "beheer    ALL=(ALL) NOPASSWD:ALL" | tee -a /etc/sudoers.d/010_beheer-nopasswd
+	echo "beheer    ALL=(ALL) NOPASSWD:ALL" | tee /etc/sudoers.d/010_beheer-nopasswd
 }
 
 function changeMotd {
