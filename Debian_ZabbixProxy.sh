@@ -103,6 +103,7 @@ fi
 main () {
 	changeSources
 	installSudo
+	changeGrub
 	setSudo
 	changeMotd
 	disableWrites
@@ -132,6 +133,12 @@ function changeSources {
 	apt autoremove -yq
 }
 
+function changeGrub {
+	echo "GRUB_HIDDEN_TIMEOUT=0" | tee -a /etc/default/grub
+	echo "GRUB_HIDDEN_TIMEOUT_QUIET=true" | tee -a /etc/default/grub
+	update-grub
+}
+
 function installSudo {
 	apt update
 	apt install sudo -yq
@@ -156,11 +163,11 @@ function changeMotd {
 }
 
 function disableWrites {
-	echo "tmpfs /var/tmp tmpfs defaults,noatime,nosuid,size=30M 0 0" | tee -a /etc/fstab
+	echo "tmpfs /var/tmp tmpfs defaults,noatime,nosuid,size=500M 0 0" | tee -a /etc/fstab
 	echo "tmpfs /var/log tmpfs defaults,noatime,nosuid,mode=0755,size=100m 0 0" |tee -a /etc/fstab
 	echo "tmpfs /tmp tmpfs defaults,noatime,nosuid,size=500m 0 0" | tee -a /etc/fstab
-	echo "tmpfs /var/run tmpfs defaults,noatime,nosuid,mode=0755,size=2m 0 0" | tee -a /etc/fstab
-	echo "tmpfs /var/spool/mqueue tmpfs defaults,noatime,nosuid,mode=0700,gid=12,size=30m 0 0" | tee -a /etc/fstab
+	echo "tmpfs /var/run tmpfs defaults,noatime,nosuid,mode=0755,size=200m 0 0" | tee -a /etc/fstab
+	echo "tmpfs /var/spool/mqueue tmpfs defaults,noatime,nosuid,mode=0700,gid=12,size=300m 0 0" | tee -a /etc/fstab
 }
 
 function smBusFix {
@@ -200,7 +207,6 @@ function installZabbixProxy {
 	echo "HistoryIndexCacheSize=25M" | tee -a /etc/zabbix/zabbix_proxy.conf
 	echo "DataSenderFrequency=10" | tee -a /etc/zabbix/zabbix_proxy.conf
 	echo "ProxyOfflineBuffer=6" | tee -a /etc/zabbix/zabbix_proxy.conf
-	echo "StartJavaPollers=5" | tee -a /etc/zabbix/zabbix_proxy.conf
 	echo "TLSConnect=psk" | tee -a /etc/zabbix/zabbix_proxy.conf
 	echo "TLSPSKIdentity=ZabbixPSK" | tee -a /etc/zabbix/zabbix_proxy.conf
 	echo "TLSPSKFile=/home/beheer/zabbix_proxy.psk" | tee -a /etc/zabbix/zabbix_proxy.conf
