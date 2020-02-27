@@ -186,8 +186,7 @@ function installZabbixAgent {
 	rm /etc/zabbix/zabbix_agentd.conf
 
 	echo "PidFile=/var/run/zabbix/zabbix_agentd.pid" | sudo tee /etc/zabbix/zabbix_agentd.conf
-	echo "LogFile=/var/log/zabbix/zabbix_agentd.log" | sudo tee -a /etc/zabbix/zabbix_agentd.conf
-	echo "LogFileSize=0" | sudo tee -a /etc/zabbix/zabbix_agentd.conf
+	echo "LogType=system" | sudo tee -a /etc/zabbix/zabbix_agentd.conf
 	echo "Server=0.0.0.0/0" | sudo tee -a /etc/zabbix/zabbix_agentd.conf
 	echo "ServerActive=0.0.0.0/0" | sudo tee -a /etc/zabbix/zabbix_agentd.conf
 	echo "Hostname=$(hostname)" | sudo tee -a /etc/zabbix/zabbix_agentd.conf
