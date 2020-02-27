@@ -109,6 +109,7 @@ main () {
 	changeMotd
 	disableWrites
 	smBusFix
+	installVeeamUtilities
 	installZabbixAgent
 	installZabbixProxy
 	if [ $openvpnInstall -eq 1 ]; then
@@ -176,6 +177,10 @@ function smBusFix {
 	update-initramfs -u
 }
 
+function installVeeamUtilities {
+	apt install mlocate -yq
+}
+
 function installZabbixAgent {
 	apt install zabbix-agent -yq
 	rm /etc/zabbix/zabbix_agentd.conf
@@ -190,8 +195,8 @@ function installZabbixAgent {
 	echo "Include=/etc/zabbix/zabbix_agentd.d/*.conf" | sudo tee -a /etc/zabbix/zabbix_agentd.conf
 	echo "Timeout=30" | sudo tee -a /etc/zabbix/zabbix_agentd.conf
 
-	systemctl restart zabbix-agent.service
 	systemctl enable zabbix-agent
+	systemctl restart zabbix-agent.service
 }
 
 function installZabbixProxy {
@@ -200,7 +205,7 @@ function installZabbixProxy {
 	sudo su beheer -c "echo \"${input_zabbix_psk}\" | tee /home/beheer/zabbix_proxy.psk"
 	AgentName=$(hostname)_Zabbix
 	echo "Server=zabbix.wijzijnde.it" | tee /etc/zabbix/zabbix_proxy.conf
-	echo "Hostname=${AgentName^}" | tee -a /etc/zabbix/zabbix_proxy.conf
+	echo "Hostname=${AgentName}" | tee -a /etc/zabbix/zabbix_proxy.conf
 	echo "PidFile=/var/run/zabbix/zabbix_proxy.pid" | tee -a /etc/zabbix/zabbix_proxy.conf
 	echo "SocketDir=/var/run/zabbix" | tee -a /etc/zabbix/zabbix_proxy.conf
 	echo "LogType=system" | tee -a /etc/zabbix/zabbix_proxy.conf
