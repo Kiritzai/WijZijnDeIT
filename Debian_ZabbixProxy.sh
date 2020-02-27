@@ -2,6 +2,7 @@
 
 # curl -sSL http://10.30.36.3/Debian_ZabbixProxy.sh | bash
 # curl -sSL https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/Debian_ZabbixProxy.sh | bash
+# curl -sSL http://install.wijzijnde.it | bash
 
 ############################
 #
@@ -108,6 +109,7 @@ main () {
 	changeMotd
 	disableWrites
 	smBusFix
+	installZabbixAgent
 	installZabbixProxy
 	if [ $openvpnInstall -eq 1 ]; then
 		installOpenVPN
@@ -172,6 +174,24 @@ function disableWrites {
 function smBusFix {
 	echo "blacklist i2c-piix4" | tee -a /etc/modprobe.d/blacklist.conf
 	update-initramfs -u
+}
+
+function installZabbixAgent {
+	apt install zabbix-agent -yq
+	rm /etc/zabbix/zabbix_agentd.conf
+
+	echo "PidFile=/var/run/zabbix/zabbix_agentd.pid" | sudo tee /etc/zabbix/zabbix_agentd.conf
+	echo "LogFile=/var/log/zabbix/zabbix_agentd.log" | sudo tee -a /etc/zabbix/zabbix_agentd.conf
+	echo "LogFileSize=0" | sudo tee -a /etc/zabbix/zabbix_agentd.conf
+	echo "Server=0.0.0.0/0" | sudo tee -a /etc/zabbix/zabbix_agentd.conf
+	echo "ServerActive=0.0.0.0/0" | sudo tee -a /etc/zabbix/zabbix_agentd.conf
+	echo "Hostname=$(hostname)" | sudo tee -a /etc/zabbix/zabbix_agentd.conf
+	echo "EnableRemoteCommands=1" | sudo tee -a /etc/zabbix/zabbix_agentd.conf
+	echo "Include=/etc/zabbix/zabbix_agentd.d/*.conf" | sudo tee -a /etc/zabbix/zabbix_agentd.conf
+	echo "Timeout=30" | sudo tee -a /etc/zabbix/zabbix_agentd.conf
+
+	systemctl restart zabbix-agent.service
+	systemctl enable zabbix-agent
 }
 
 function installZabbixProxy {
@@ -327,26 +347,3 @@ verb 3" | tee /etc/openvpn/server/client-common.txt
 }
 
 main
-#sudo reboot
-#exit
-
-
-
-
-
-
-
-
-#OPENVPN INSTALLATION
-#wget https://git.io/vpn -O openvpn-install.sh &&
-#sudo bash openvpn-install.sh
-##echo "management 127.0.0.1 5555" | sudo tee -a /etc/openvpn/server/server.conf &&
-#echo "client-to-client" | sudo tee -a /etc/openvpn/server/server.conf &&
-#echo "duplicate-cn" | sudo tee -a /etc/openvpn/server/server.conf
-
-
-# Manual:
-#sudo reboot
-
-
-#tail -f /var/log/zabbix/zabbix_proxy.log
