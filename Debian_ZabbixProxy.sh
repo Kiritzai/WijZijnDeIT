@@ -109,7 +109,7 @@ main () {
 	changeMotd
 	disableWrites
 	smBusFix
-	installVeeamUtilities
+	installUtilities
 	installZabbixAgent
 	installZabbixProxy
 	if [ $openvpnInstall -eq 1 ]; then
@@ -177,8 +177,8 @@ function smBusFix {
 	update-initramfs -u
 }
 
-function installVeeamUtilities {
-	apt install mlocate -yq
+function installUtilities {
+	apt install mlocate open-vm-tools -yq
 }
 
 function installZabbixAgent {
