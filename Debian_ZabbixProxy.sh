@@ -3,6 +3,7 @@
 # curl -sSL http://10.30.36.3/Debian_ZabbixProxy.sh | bash
 # curl -sSL https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/Debian_ZabbixProxy.sh | bash
 # curl -sSL http://install.wijzijnde.it | bash
+# bash <(wget -O - http://install.wijzijnde.it)
 
 ############################
 #
@@ -103,13 +104,12 @@ fi
 
 main () {
 	changeSources
-	installSudo
+	installUtilities
 	changeGrub
 	setSudo
 	changeMotd
 	disableWrites
 	smBusFix
-	installUtilities
 	installZabbixAgent
 	installZabbixProxy
 	if [ $openvpnInstall -eq 1 ]; then
@@ -136,14 +136,13 @@ function changeSources {
 	apt autoremove -yq
 }
 
+function installUtilities {
+	apt install mlocate open-vm-tools sudo curl -yq
+}
+
 function changeGrub {
 	sed -i 's/GRUB_TIMEOUT=./GRUB_TIMEOUT=0/g' /etc/default/grub
 	update-grub
-}
-
-function installSudo {
-	apt update
-	apt install sudo -yq
 }
 
 function setSudo {
@@ -175,10 +174,6 @@ function disableWrites {
 function smBusFix {
 	echo "blacklist i2c-piix4" | tee -a /etc/modprobe.d/blacklist.conf
 	update-initramfs -u
-}
-
-function installUtilities {
-	apt install mlocate open-vm-tools -yq
 }
 
 function installZabbixAgent {
@@ -351,3 +346,4 @@ verb 3" | tee /etc/openvpn/server/client-common.txt
 }
 
 main
+reboot
