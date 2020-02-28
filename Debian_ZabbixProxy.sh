@@ -188,7 +188,7 @@ function installZabbixAgent {
 	echo "PidFile=/var/run/zabbix/zabbix_agentd.pid" | sudo tee /etc/zabbix/zabbix_agentd.conf
 	echo "LogType=system" | sudo tee -a /etc/zabbix/zabbix_agentd.conf
 	echo "Server=0.0.0.0/0" | sudo tee -a /etc/zabbix/zabbix_agentd.conf
-	echo "ServerActive=0.0.0.0/0" | sudo tee -a /etc/zabbix/zabbix_agentd.conf
+	echo "ServerActive=127.0.0.1" | sudo tee -a /etc/zabbix/zabbix_agentd.conf
 	echo "Hostname=$(hostname)" | sudo tee -a /etc/zabbix/zabbix_agentd.conf
 	echo "EnableRemoteCommands=1" | sudo tee -a /etc/zabbix/zabbix_agentd.conf
 	echo "Include=/etc/zabbix/zabbix_agentd.d/*.conf" | sudo tee -a /etc/zabbix/zabbix_agentd.conf
@@ -218,7 +218,7 @@ function installZabbixProxy {
 	echo "EnableRemoteCommands=1" | tee -a /etc/zabbix/zabbix_proxy.conf
 	echo "LogSlowQueries=3000" | tee -a /etc/zabbix/zabbix_proxy.conf
 	echo "CacheSize=50M" | tee -a /etc/zabbix/zabbix_proxy.conf
-	echo "StartPingers=2" | tee -a /etc/zabbix/zabbix_proxy.conf
+	echo "StartPingers=4" | tee -a /etc/zabbix/zabbix_proxy.conf
 	echo "StartPollers=10" | tee -a /etc/zabbix/zabbix_proxy.conf
 	echo "StartPollersUnreachable=10" | tee -a /etc/zabbix/zabbix_proxy.conf
 	echo "StatsAllowedIP=0.0.0.0/0" | tee -a /etc/zabbix/zabbix_proxy.conf
