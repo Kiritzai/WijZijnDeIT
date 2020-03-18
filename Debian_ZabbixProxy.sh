@@ -282,6 +282,7 @@ push \"dhcp-option DOMAIN $input_domain_name\"
 push \"dhcp-option DNS $input_dns_server\"
 push \"ignore redirect-gateway\"
 push \"route $input_ip_route\"
+push \"route-metric 9000\"
 keepalive 10 120
 cipher AES-256-CBC
 user nobody
