@@ -22,11 +22,17 @@ clear
 echo
 echo "####################################"
 echo "##"
-echo "## Enter Zabbix PSK Proxy"
+echo "## Do you want to install Zabbix Proxy?"
+echo "##"
+echo "## 1 = YES"
 echo "##"
 echo "####################################"
 echo
-read input_zabbix_psk < /dev/tty
+read zabbixInstall < /dev/tty
+if [ -z $zabbixInstall ]; then
+	# Zabbix Proxy will not install by default
+	zabbixInstall=0
+fi
 
 clear
 echo
@@ -42,6 +48,18 @@ read openvpnInstall < /dev/tty
 if [ -z $openvpnInstall ]; then
 	# OpenVPN will not install by default
 	openvpnInstall=0
+fi
+
+if [ $zabbixInstall -eq 1 ]; then
+	clear
+	echo
+	echo "####################################"
+	echo "##"
+	echo "## Enter Zabbix PSK Proxy"
+	echo "##"
+	echo "####################################"
+	echo
+	read input_zabbix_psk < /dev/tty
 fi
 
 if [ $openvpnInstall -eq 1 ]; then
@@ -110,8 +128,11 @@ main () {
 	changeMotd
 	disableWrites
 	smBusFix
-	installZabbixAgent
-	installZabbixProxy
+	if [ $zabbixInstall -eq 1 ]; then
+		installZabbixRepo
+		installZabbixAgent
+		installZabbixProxy
+	fi
 	if [ $openvpnInstall -eq 1 ]; then
 		installOpenVPN
 	fi
@@ -129,8 +150,6 @@ function changeSources {
 	echo "deb-src http://ftp.debian.org/debian/ stable-updates contrib main non-free" | tee -a /etc/apt/sources.list
 	apt update
 	apt install --reinstall dpkg libc-bin -yq
-	wget https://repo.zabbix.com/zabbix/4.4/debian/pool/main/z/zabbix-release/zabbix-release_4.4-1+buster_all.deb
-	dpkg -i zabbix-release_4.4-1+buster_all.deb
 	apt update
 	apt upgrade -yq
 	apt autoremove -yq
@@ -142,6 +161,7 @@ function installUtilities {
 
 function changeGrub {
 	sed -i 's/GRUB_TIMEOUT=./GRUB_TIMEOUT=0/g' /etc/default/grub
+	#sed -i 's/GRUB_CMDLINE_LINUX=""./GRUB_CMDLINE_LINUX="net.ifnames=0 biosdevname=0"/g' /etc/default/grub
 	update-grub
 }
 
@@ -155,8 +175,9 @@ function changeMotd {
 	echo "###########################################" | tee /etc/motd
 	echo "###" | tee -a /etc/motd
 	if [ $openvpnInstall -eq 1 ]; then
-		echo "### WijZijnDe.IT Zabbix Proxy & OpenVPN Server" | tee -a /etc/motd
-	else
+		echo "### WijZijnDe.IT OpenVPN Server" | tee -a /etc/motd
+	fi
+	if [ $zabbixInstall -eq 1 ]; then
 		echo "### WijZijnDe.IT Zabbix Proxy" | tee -a /etc/motd
 	fi
 	echo "###" | tee -a /etc/motd
@@ -174,6 +195,12 @@ function disableWrites {
 function smBusFix {
 	echo "blacklist i2c-piix4" | tee -a /etc/modprobe.d/blacklist.conf
 	update-initramfs -u
+}
+
+function installZabbixRepo {
+	wget https://repo.zabbix.com/zabbix/5.2/debian/pool/main/z/zabbix-release/zabbix-release_5.2-1+debian10_all.deb
+	dpkg -i zabbix-release_5.2-1+debian10_all.deb
+	apt update
 }
 
 function installZabbixAgent {
@@ -195,7 +222,9 @@ function installZabbixAgent {
 
 function installZabbixProxy {
 	apt install zabbix-proxy-sqlite3 -yq
-	zcat /usr/share/doc/zabbix-proxy-sqlite3/schema.sql.gz | sqlite3 /tmp/zabbix.db
+	mkdir /opt/zabbix
+	zcat /usr/share/doc/zabbix-proxy-sqlite3/schema.sql.gz | sqlite3 /opt/zabbix/zabbix.db
+	chmod -R 777 /opt/zabbix
 	sudo su beheer -c "echo \"${input_zabbix_psk}\" | tee /home/beheer/zabbix_proxy.psk"
 	AgentName=$(hostname)_Zabbix
 	echo "Server=zabbix.wijzijnde.it" | tee /etc/zabbix/zabbix_proxy.conf
@@ -203,7 +232,7 @@ function installZabbixProxy {
 	echo "PidFile=/var/run/zabbix/zabbix_proxy.pid" | tee -a /etc/zabbix/zabbix_proxy.conf
 	echo "SocketDir=/var/run/zabbix" | tee -a /etc/zabbix/zabbix_proxy.conf
 	echo "LogType=system" | tee -a /etc/zabbix/zabbix_proxy.conf
-	echo "DBName=/tmp/zabbix.db" | tee -a /etc/zabbix/zabbix_proxy.conf
+	echo "DBName=/opt/zabbix/zabbix.db" | tee -a /etc/zabbix/zabbix_proxy.conf
 	echo "DBUser=zabbix" | tee -a /etc/zabbix/zabbix_proxy.conf
 	echo "SNMPTrapperFile=/var/log/snmptrap.log" | tee -a /etc/zabbix/zabbix_proxy.conf
 	echo "Timeout=30" | tee -a /etc/zabbix/zabbix_proxy.conf
