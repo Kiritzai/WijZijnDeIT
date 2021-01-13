@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# curl -sSL http://10.30.36.3/Debian_ZabbixProxy.sh | bash
-# curl -sSL https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/Debian_ZabbixProxy.sh | bash
+# curl -sSL https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/Debian_ZabbixProxy_Upgrade.sh | bash
 # curl -sSL http://install.wijzijnde.it | bash
 # bash <(wget -O - http://install.wijzijnde.it)
+# bash <(wget -O - https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/Debian_ZabbixProxy_Upgrade.sh)
 
 ############################
 #
@@ -39,7 +39,7 @@ function changeSources {
 	apt update
 	apt install --reinstall dpkg libc-bin -yq
 	apt update
-	apt upgrade -yq
+	apt -yq -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade
 	apt autoremove -yq
 }
 
@@ -57,7 +57,6 @@ function installZabbixRepo {
 	dpkg -i --force-all -B zabbix-release_5.2-1+debian10_all.deb
 	rm -rf zabbix-release_5.2-1+debian10_all.deb
 	apt update
-
 }
 
 main
