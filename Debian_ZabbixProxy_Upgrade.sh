@@ -24,7 +24,7 @@ main () {
 	stopServices
 	installZabbixRepo
 	changeSources
-	#disableWrites
+	disableWrites
 	startServices
 }
 
@@ -51,6 +51,11 @@ function changeSources {
 }
 
 function disableWrites {
+	if grep -iRlq "tmpfs /var/tmp tmpfs defaults,noatime,nosuid,size=500M 0 0" /etc/fstab; then
+		number=$(grep -iRn "tmpfs /var/tmp tmpfs defaults,noatime,nosuid,size=500M 0 0" /etc/fstab | cut -d: -f1)
+		sed -i "$number,\$d" /etc/fstab
+	fi
+
 	echo "tmpfs /var/tmp tmpfs defaults,noatime,nosuid,size=500M 0 0" | tee -a /etc/fstab
 	echo "tmpfs /var/log tmpfs defaults,noatime,nosuid,mode=0755,size=100m 0 0" |tee -a /etc/fstab
 	echo "tmpfs /tmp tmpfs defaults,noatime,nosuid,size=500m 0 0" | tee -a /etc/fstab
@@ -59,13 +64,11 @@ function disableWrites {
 }
 
 function installZabbixRepo {
-	rm -rf /opt/zabbix/zabbix.db
-	rm -rf /tmp/zabbix.db
-	rm -rf /etc/apt/sources.list.d/zabbix.list
+	find / -type f -name "zabbix.db" -delete
+	find / -type f -name "zabbix.list" -delete
 	wget https://repo.zabbix.com/zabbix/5.2/debian/pool/main/z/zabbix-release/zabbix-release_5.2-1+debian10_all.deb
 	dpkg -i --force-all -B zabbix-release_5.2-1+debian10_all.deb
 	rm -rf zabbix-release_5.2-1+debian10_all.deb
-	apt update
 }
 
 function startServices {
