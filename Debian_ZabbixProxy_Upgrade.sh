@@ -21,10 +21,17 @@ clear
 
 
 main () {
+	stopServices
 	installZabbixRepo
 	changeSources
 	disableWrites
-	exit
+	startServices
+}
+
+
+function stopServices {
+	systemctl stop zabbix-proxy
+	systemctl stop zabbix-agent
 }
 
 function changeSources {
@@ -52,6 +59,7 @@ function disableWrites {
 }
 
 function installZabbixRepo {
+	rm -rf /opt/zabbix/zabbix.db
 	rm -rf /etc/apt/sources.list.d/zabbix.list
 	wget https://repo.zabbix.com/zabbix/5.2/debian/pool/main/z/zabbix-release/zabbix-release_5.2-1+debian10_all.deb
 	dpkg -i --force-all -B zabbix-release_5.2-1+debian10_all.deb
@@ -59,5 +67,10 @@ function installZabbixRepo {
 	apt update
 }
 
+function startServices {
+	systemctl start zabbix-proxy
+	systemctl start zabbix-agent
+}
+
 main
-reboot
+#reboot
