@@ -232,7 +232,7 @@ function installZabbixProxy {
 	echo "PidFile=/var/run/zabbix/zabbix_proxy.pid" | tee -a /etc/zabbix/zabbix_proxy.conf
 	echo "SocketDir=/var/run/zabbix" | tee -a /etc/zabbix/zabbix_proxy.conf
 	echo "LogType=system" | tee -a /etc/zabbix/zabbix_proxy.conf
-	echo "DBName=/opt/zabbix/zabbix.db" | tee -a /etc/zabbix/zabbix_proxy.conf
+	echo "DBName=/tmp/zabbix.db" | tee -a /etc/zabbix/zabbix_proxy.conf
 	echo "DBUser=zabbix" | tee -a /etc/zabbix/zabbix_proxy.conf
 	echo "SNMPTrapperFile=/var/log/snmptrap.log" | tee -a /etc/zabbix/zabbix_proxy.conf
 	echo "Timeout=30" | tee -a /etc/zabbix/zabbix_proxy.conf

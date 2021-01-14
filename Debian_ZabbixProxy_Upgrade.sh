@@ -65,7 +65,6 @@ function disableWrites {
 }
 
 function changeCommands {
-
 	if grep -iRlq "EnableRemoteCommands=1" /etc/zabbix/zabbix_agentd.conf ; then
 		sed -i 's/EnableRemoteCommands=1/AllowKey=system.run[*]/g' /etc/zabbix/zabbix_agentd.conf
 	fi
