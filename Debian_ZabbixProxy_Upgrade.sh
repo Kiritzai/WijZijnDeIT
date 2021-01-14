@@ -25,6 +25,7 @@ main () {
 	installZabbixRepo
 	changeSources
 	disableWrites
+	changeCommands
 	startServices
 }
 
@@ -61,6 +62,17 @@ function disableWrites {
 	echo "tmpfs /tmp tmpfs defaults,noatime,nosuid,size=500m 0 0" | tee -a /etc/fstab
 	echo "tmpfs /var/run tmpfs defaults,noatime,nosuid,mode=0755,size=200m 0 0" | tee -a /etc/fstab
 	echo "tmpfs /var/spool/mqueue tmpfs defaults,noatime,nosuid,mode=0700,gid=12,size=300m 0 0" | tee -a /etc/fstab
+}
+
+function changeCommands {
+
+	if grep -iRlq "EnableRemoteCommands=1" /etc/zabbix/zabbix_agentd.conf ; then
+		sed -i 's/EnableRemoteCommands=1/AllowKey=system.run[*]/g' /etc/zabbix/zabbix_agentd.conf
+	fi
+
+	if ! grep -iRlq "AllowKey=system.run\[\*\]" /etc/zabbix/zabbix_agentd.conf ; then
+		echo "AllowKey=system.run[*]" | tee -a /etc/zabbix/zabbix_agentd.conf
+	fi
 }
 
 function installZabbixRepo {

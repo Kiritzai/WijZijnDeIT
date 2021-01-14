@@ -212,7 +212,7 @@ function installZabbixAgent {
 	echo "Server=0.0.0.0/0" | sudo tee -a /etc/zabbix/zabbix_agentd.conf
 	echo "ServerActive=127.0.0.1" | sudo tee -a /etc/zabbix/zabbix_agentd.conf
 	echo "Hostname=$(hostname)" | sudo tee -a /etc/zabbix/zabbix_agentd.conf
-	echo "EnableRemoteCommands=1" | sudo tee -a /etc/zabbix/zabbix_agentd.conf
+	echo "AllowKey=system.run[*]" | sudo tee -a /etc/zabbix/zabbix_agentd.conf
 	echo "Include=/etc/zabbix/zabbix_agentd.d/*.conf" | sudo tee -a /etc/zabbix/zabbix_agentd.conf
 	echo "Timeout=30" | sudo tee -a /etc/zabbix/zabbix_agentd.conf
 
