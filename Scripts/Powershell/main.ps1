@@ -10,6 +10,7 @@ function Show-Menu
     )
     Clear-Host
     Write-Host ""
+    Write-Host ""
     Write-Host `t"================ $Title ================"
     Write-Host `t"Press '1' for Testing AD Credentials."
     Write-Host `t"Press '2' for this option."
