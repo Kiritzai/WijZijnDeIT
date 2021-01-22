@@ -20,7 +20,7 @@ function Show-Menu
 do
 {
     Show-Menu -Title "WijZijnDe.IT"
-    $selection = Read-Host "Please make a selection"
+    $selection = Read-Host `t"Please make a selection"
     switch ($selection)
     {
         '1' { Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/Scripts/Powershell/ActiveDirectoryTestCredentials.ps1')) }
