@@ -19,15 +19,17 @@ function Show-Menu
 
 Show-Menu -Title "WijZijnDe.IT"
 
-$selection = Read-Host "Please make a selection"
-switch ($selection)
+do
 {
-    '1' { Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/Scripts/Powershell/ActiveDirectoryTestCredentials.ps1')) }
-    '2' { Write-Host 'You chose option #2' }
-    '3' { Write-Host 'You chose option #3' }
-    'q' { return }
-}
-
+    $selection = Read-Host "Please make a selection"
+    switch ($selection)
+    {
+        '1' { Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/Scripts/Powershell/ActiveDirectoryTestCredentials.ps1')) }
+        '2' { Write-Host 'You chose option #2' }
+        '3' { Write-Host 'You chose option #3' }
+        #'q' { return }
+    }
+} until ($selection -eq 'q')
 
 #do
 #{
