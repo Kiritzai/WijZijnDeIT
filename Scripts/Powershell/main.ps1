@@ -14,7 +14,7 @@ function Show-Menu
     Write-Host "Press '1' for Testing AD Credentials."
     Write-Host "Press '2' for this option."
     Write-Host "Press '3' for this option."
-    #Write-Host "Press 'Q' to quit."
+    Write-Host "Press 'q' to quit."
 }
 
 Show-Menu -Title "WijZijnDe.IT"
