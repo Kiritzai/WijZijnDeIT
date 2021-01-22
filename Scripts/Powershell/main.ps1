@@ -19,7 +19,7 @@ function Show-Menu
 
 #do
 #{
-    Show-Menu –Title 'WijZijnDe.IT'
+    Show-Menu
     $selection = Read-Host "Please make a selection"
     switch ($selection)
     {
