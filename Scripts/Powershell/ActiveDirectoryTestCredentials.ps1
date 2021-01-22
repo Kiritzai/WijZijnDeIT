@@ -17,11 +17,11 @@ $domain = New-Object System.DirectoryServices.DirectoryEntry($CurrentDomain,$cre
 
 if ([string]::IsNullOrWhitespace($domain.name))
 {
-    write-host "Authentication failed" -ForegroundColor Red
-    Read-Host ""
+    Write-Host "Authentication failed" -ForegroundColor Red
 }
 else
 {
-    write-host "Successfully authenticated with domain $domain.name" -ForegroundColor Green
-    Read-Host ""
+    Write-Host "Authentication successful" -ForegroundColor Green
 }
+Write-Host `n"Continue"
+$UserInput = $Host.UI.ReadLine()
