@@ -9,12 +9,12 @@ function Show-Menu
         [string]$Title = 'WijZijnDe.IT'
     )
     Clear-Host
-    Write-Host "================ $Title ================"
-    
-    Write-Host "Press '1' for Testing AD Credentials."
-    Write-Host "Press '2' for this option."
-    Write-Host "Press '3' for this option."
-    Write-Host "Press 'q' to quit."
+    Write-Host ""
+    Write-Host `t"================ $Title ================"
+    Write-Host `t"Press '1' for Testing AD Credentials."
+    Write-Host `t"Press '2' for this option."
+    Write-Host `t"Press '3' for this option."
+    Write-Host `t"Press 'q' to quit."
 }
 
 do
