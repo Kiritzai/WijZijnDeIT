@@ -17,6 +17,8 @@ function Show-Menu
     #Write-Host "Press 'Q' to quit."
 }
 
+Read-Host "test"
+
 Show-Menu
 
 #do
