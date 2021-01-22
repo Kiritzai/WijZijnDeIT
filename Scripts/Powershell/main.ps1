@@ -6,7 +6,7 @@
 function Show-Menu
 {
     param (
-        [string]$Title = 'My Menu'
+        [string]$Title = 'WijZijnDe.IT'
     )
     Clear-Host
     Write-Host "================ $Title ================"
@@ -17,15 +17,16 @@ function Show-Menu
     #Write-Host "Press 'Q' to quit."
 }
 
-Show-Menu
+Show-Menu -Title "WijZijnDe.IT"
 
-Read-Host "Please make a selection"
-    switch ($selection)
-    {
-        '1' { Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/Scripts/Powershell/ActiveDirectoryTestCredentials.ps1')) }
-        '2' { 'You chose option #2' }
-        '3' { 'You chose option #3' }
-    }
+$selection = Read-Host "Please make a selection"
+switch ($selection)
+{
+    '1' { Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/Scripts/Powershell/ActiveDirectoryTestCredentials.ps1')) }
+    '2' { Write-Host 'You chose option #2' }
+    '3' { Write-Host 'You chose option #3' }
+    'q' { return }
+}
 
 
 #do
