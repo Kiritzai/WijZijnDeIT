@@ -1,6 +1,7 @@
 
+Clear-Host
 
-$cred = Get-Credential #Read credentials
+$cred = Get-Credential | Out-Null
 $username = $cred.username
 $password = $cred.GetNetworkCredential().password
 
