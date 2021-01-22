@@ -1,13 +1,20 @@
 
 Clear-Host
 
-$cred = Get-Credential | Out-Null
-$username = $cred.username
-$password = $cred.GetNetworkCredential().password
+$userName = Read-Host "Username"
+$passWord = Read-Host "Password" | ConvertTo-SecureString -asPlainText -Force
+
+$credential = New-Object System.Management.Automation.PSCredential($userName, $passWord)
+$cred = Get-Credential -Credential $credential
+
+#Exit
+#$cred = Get-Credential | Out-Null
+#$username = $cred.username
+#$password = $cred.GetNetworkCredential().password
 
 # Get current domain using logged-on user's credentials
 $CurrentDomain = "LDAP://" + ([ADSI]"").distinguishedName
-$domain = New-Object System.DirectoryServices.DirectoryEntry($CurrentDomain,$UserName,$Password)
+$domain = New-Object System.DirectoryServices.DirectoryEntry($CurrentDomain,$cred.username,$cred.GetNetworkCredential().password)
 
 if ([string]::IsNullOrWhitespace($domain.name))
 {
