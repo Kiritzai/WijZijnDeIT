@@ -17,10 +17,9 @@ function Show-Menu
     Write-Host "Press 'q' to quit."
 }
 
-Show-Menu -Title "WijZijnDe.IT"
-
 do
 {
+    Show-Menu -Title "WijZijnDe.IT"
     $selection = Read-Host "Please make a selection"
     switch ($selection)
     {
