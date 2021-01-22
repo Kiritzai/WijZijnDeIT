@@ -6,7 +6,7 @@ Write-Host `t"Active Directory Test Credentials"
 Write-Host ""
 
 $userName = Read-Host "Username"
-$passWord = Read-Host "Password" -MaskInput | ConvertTo-SecureString -asPlainText -Force
+$passWord = Read-Host "Password" | ConvertTo-SecureString -asPlainText -Force
 
 $credential = New-Object System.Management.Automation.PSCredential($userName, $passWord)
 $cred = Get-Credential -Credential $credential
