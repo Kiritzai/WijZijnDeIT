@@ -17,16 +17,18 @@ function Show-Menu
     #Write-Host "Press 'Q' to quit."
 }
 
+Show-Menu
+
 #do
 #{
-    Show-Menu
-    $selection = Read-Host "Please make a selection"
-    switch ($selection)
-    {
-        '1' { Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/Scripts/Powershell/ActiveDirectoryTestCredentials.ps1')) }
-        '2' { 'You chose option #2' }
-        '3' { 'You chose option #3' }
-    }
-    pause
+#    Show-Menu
+#    $selection = Read-Host "Please make a selection"
+#    switch ($selection)
+#    {
+#        '1' { Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/Scripts/Powershell/ActiveDirectoryTestCredentials.ps1')) }
+#        '2' { 'You chose option #2' }
+#        '3' { 'You chose option #3' }
+#    }
+#    pause
 #}
 #until ($selection -eq 'q')
