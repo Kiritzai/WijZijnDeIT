@@ -14,11 +14,11 @@ function Show-Menu
     Write-Host "Press '1' for Testing AD Credentials."
     Write-Host "Press '2' for this option."
     Write-Host "Press '3' for this option."
-    Write-Host "Press 'Q' to quit."
+    #Write-Host "Press 'Q' to quit."
 }
 
-do
-{
+#do
+#{
     Show-Menu –Title 'WijZijnDe.IT'
     $selection = Read-Host "Please make a selection"
     switch ($selection)
@@ -28,5 +28,5 @@ do
         '3' { 'You chose option #3' }
     }
     pause
-}
-until ($selection -eq 'q')
+#}
+#until ($selection -eq 'q')
