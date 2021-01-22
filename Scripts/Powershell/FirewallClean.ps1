@@ -1,4 +1,4 @@
-# Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+# Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/Scripts/Powershell/FirewallClean.ps1'))
 
 $FWInboundRules       = Get-NetFirewallRule -Direction Inbound | Where-Object {$_.Owner -ne $Null} | Sort-Object Displayname, Owner
 $FWInboundRulesUnique = Get-NetFirewallRule -Direction Inbound | Where-Object {$_.Owner -ne $Null} | Sort-Object Displayname, Owner -Unique
