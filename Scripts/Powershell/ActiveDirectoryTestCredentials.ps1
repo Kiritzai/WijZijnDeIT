@@ -2,7 +2,7 @@
 Clear-Host
 
 Write-Host ""
-Write-Host `t"Active Directory Test Credentials"
+Write-Host "Active Directory Test Credentials"
 Write-Host ""
 
 $userName = Read-Host "Username"

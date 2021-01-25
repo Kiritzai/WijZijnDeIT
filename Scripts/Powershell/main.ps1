@@ -11,17 +11,17 @@ function Show-Menu
     Clear-Host
     Write-Host ""
     Write-Host ""
-    Write-Host `t"================ $Title ================"
-    Write-Host `t"Press '1' for Testing AD Credentials."
-    Write-Host `t"Press '2' for Cleaning Windows Firewall Rules for RDS Servers"
-    Write-Host `t"Press '3' for this option."
-    Write-Host `t"Press 'q' to quit."
+    Write-Host "================ $Title ================"
+    Write-Host "Press '1' for Testing AD Credentials."
+    Write-Host "Press '2' for Cleaning Windows Firewall Rules for RDS Servers"
+    Write-Host "Press '3' for this option."
+    Write-Host "Press 'q' to quit."
 }
 
 do
 {
     Show-Menu -Title "WijZijnDe.IT"
-    $selection = Read-Host `t"Please make a selection"
+    $selection = Read-Host "Please make a selection"
     switch ($selection)
     {
         '1' { Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/Scripts/Powershell/ActiveDirectoryTestCredentials.ps1')) }
