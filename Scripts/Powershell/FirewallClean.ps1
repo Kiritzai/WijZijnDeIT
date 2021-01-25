@@ -40,20 +40,27 @@ $output
 
 Write-Host ""
 $confirmation = Read-Host "Would you like to remove firewall rules? (y/n)"
+Write-Host ""
 if ($confirmation -eq 'y') {
-    
+
+    Write-Host "Removing Inbound rules..." -ForegroundColor Yellow
+
     if ($FWInboundRules.Count -ne $FWInboundRulesUnique.Count) {
         Compare-Object -referenceObject $FWInboundRules -differenceObject $FWInboundRulesUnique | Select-Object -ExpandProperty inputobject | Remove-NetFirewallRule
     }
+
+    Write-Host "Removing Outbound rules..." -ForegroundColor Yellow
 
     if ($FWOutboundRules.Count -ne $FWOutboundRulesUnique.Count) {
         Compare-Object -referenceObject $FWOutboundRules -differenceObject $FWOutboundRulesUnique | Select-Object -ExpandProperty inputobject | Remove-NetFirewallRule
     }
 
+    
+    Write-Host "Firewall rules removed!" -ForegroundColor Green
+
 } else {
-    Write-Host "No"
+    Write-Host "Cancelled" -ForegroundColor Red
 }
 
-Write-Host ""
-Write-Host "Firewall rules removed!" -ForegroundColor Green
+
 $UserInput = $Host.UI.ReadLine()
