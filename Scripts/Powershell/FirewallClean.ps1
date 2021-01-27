@@ -55,15 +55,15 @@ if ($Silent) {
 
     Write-Host "Removing Inbound rules..." -ForegroundColor Yellow
 
-    #if ($FWInboundRules.Count -ne $FWInboundRulesUnique.Count) {
-    #    Compare-Object -referenceObject $FWInboundRules -differenceObject $FWInboundRulesUnique | Select-Object -ExpandProperty inputobject | Remove-NetFirewallRule
-    #}
+    if ($FWInboundRules.Count -ne $FWInboundRulesUnique.Count) {
+        Compare-Object -referenceObject $FWInboundRules -differenceObject $FWInboundRulesUnique | Select-Object -ExpandProperty inputobject | Remove-NetFirewallRule
+    }
 
     Write-Host "Removing Outbound rules..." -ForegroundColor Yellow
 
-    #if ($FWOutboundRules.Count -ne $FWOutboundRulesUnique.Count) {
-    #    Compare-Object -referenceObject $FWOutboundRules -differenceObject $FWOutboundRulesUnique | Select-Object -ExpandProperty inputobject | Remove-NetFirewallRule
-    #}
+    if ($FWOutboundRules.Count -ne $FWOutboundRulesUnique.Count) {
+        Compare-Object -referenceObject $FWOutboundRules -differenceObject $FWOutboundRulesUnique | Select-Object -ExpandProperty inputobject | Remove-NetFirewallRule
+    }
 
 } else {
 
