@@ -1,13 +1,26 @@
 # Cleaning firewall rules for RDS Servers
 # Set-ExecutionPolicy Bypass -Scope Process -Force;
 # [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/Scripts/Powershell/FirewallClean.ps1'))
+# SILENT: [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/Scripts/Powershell/FirewallClean.ps1 -Silent:$true'))
 #
 # Add this registry key to make sure rules are removed
 # [microsoft.win32.registry]::SetValue("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy", "DeleteUserAppContainersOnLogoff", 1)
 #
 
+param (
+    [switch]$Silent = $false
+)
+
 Clear-Host
 
+$infoText = @"
+!!Caution!!
+Make sure that no users are logged on this server besides an administrator.
+"@
+
+$infoText
+
+Write-Host ""
 Write-Host ""
 Write-Host "Getting all Firewall Rules... ( This can take a while )"
 Write-Host ""
@@ -38,29 +51,48 @@ Outbound rules to remove    $FWOutboundRulesRemoval
 
 $output
 
-Write-Host ""
-$confirmation = Read-Host "Would you like to remove firewall rules? (y/n)"
-Write-Host ""
-if ($confirmation -eq 'y') {
+if ($Silent) {
 
     Write-Host "Removing Inbound rules..." -ForegroundColor Yellow
 
-    if ($FWInboundRules.Count -ne $FWInboundRulesUnique.Count) {
-        Compare-Object -referenceObject $FWInboundRules -differenceObject $FWInboundRulesUnique | Select-Object -ExpandProperty inputobject | Remove-NetFirewallRule
-    }
+    #if ($FWInboundRules.Count -ne $FWInboundRulesUnique.Count) {
+    #    Compare-Object -referenceObject $FWInboundRules -differenceObject $FWInboundRulesUnique | Select-Object -ExpandProperty inputobject | Remove-NetFirewallRule
+    #}
 
     Write-Host "Removing Outbound rules..." -ForegroundColor Yellow
 
-    if ($FWOutboundRules.Count -ne $FWOutboundRulesUnique.Count) {
-        Compare-Object -referenceObject $FWOutboundRules -differenceObject $FWOutboundRulesUnique | Select-Object -ExpandProperty inputobject | Remove-NetFirewallRule
-    }
-
-    
-    Write-Host "Firewall rules removed!" -ForegroundColor Green
+    #if ($FWOutboundRules.Count -ne $FWOutboundRulesUnique.Count) {
+    #    Compare-Object -referenceObject $FWOutboundRules -differenceObject $FWOutboundRulesUnique | Select-Object -ExpandProperty inputobject | Remove-NetFirewallRule
+    #}
 
 } else {
-    Write-Host "Cancelled" -ForegroundColor Red
+
+    Write-Host ""
+    $confirmation = Read-Host "Would you like to remove firewall rules? (y/n)"
+    Write-Host ""
+    if ($confirmation -eq 'y') {
+    
+        Write-Host "Removing Inbound rules..." -ForegroundColor Yellow
+    
+        if ($FWInboundRules.Count -ne $FWInboundRulesUnique.Count) {
+            Compare-Object -referenceObject $FWInboundRules -differenceObject $FWInboundRulesUnique | Select-Object -ExpandProperty inputobject | Remove-NetFirewallRule
+        }
+    
+        Write-Host "Removing Outbound rules..." -ForegroundColor Yellow
+    
+        if ($FWOutboundRules.Count -ne $FWOutboundRulesUnique.Count) {
+            Compare-Object -referenceObject $FWOutboundRules -differenceObject $FWOutboundRulesUnique | Select-Object -ExpandProperty inputobject | Remove-NetFirewallRule
+        }
+    
+        
+        Write-Host "Firewall rules removed!" -ForegroundColor Green
+    
+    } else {
+        Write-Host "Cancelled" -ForegroundColor Red
+    }
 }
+
+
 
 
 $UserInput = $Host.UI.ReadLine()
