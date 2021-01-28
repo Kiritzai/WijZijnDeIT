@@ -5,7 +5,8 @@
 #
 # NEW VERSION
 #
-# [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; &([scriptblock]::Create((Invoke-WebRequest -useb 'https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/Scripts/Powershell/FirewallClean.ps1'))) -Silent:$true
+# [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::SecurityProtocol -bor 3072; &([scriptblock]::Create((Invoke-WebRequest -useb 'https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/Scripts/Powershell/FirewallClean.ps1'))) -Silent:$true
+# [System.Net.Cache.RequestCacheLevel]::NoCacheNoStore; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::SecurityProtocol -bor 3072; &([scriptblock]::Create((Invoke-WebRequest -useb 'https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/Scripts/Powershell/FirewallClean.ps1'))) -Silent:$true
 #
 #
 # Add this registry key to make sure rules are removed
