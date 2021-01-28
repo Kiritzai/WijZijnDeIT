@@ -1,14 +1,11 @@
 # Cleaning firewall rules for RDS Servers
 # Set-ExecutionPolicy Bypass -Scope Process -Force;
-# [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/Scripts/Powershell/FirewallClean.ps1'))
-# SILENT: [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/Scripts/Powershell/FirewallClean.ps1 -Silent:$true'))
-#
 # NEW VERSION
 #
 # [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::SecurityProtocol -bor 3072; &([scriptblock]::Create((Invoke-WebRequest -useb 'https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/Scripts/Powershell/FirewallClean.ps1'))) -Silent:$true
 # [System.Net.Cache.RequestCacheLevel]::NoCacheNoStore; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::SecurityProtocol -bor 3072; &([scriptblock]::Create((Invoke-WebRequest -useb 'https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/Scripts/Powershell/FirewallClean.ps1'))) -Silent:$true
 #
-#
+# 
 # Add this registry key to make sure rules are removed
 # [microsoft.win32.registry]::SetValue("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy", "DeleteUserAppContainersOnLogoff", 1)
 #
@@ -22,6 +19,10 @@ Clear-Host
 $infoText = @"
 !!Caution!!
 Make sure that no users are logged on this server besides an administrator.
+It can cause problems with login/logout proccess of a session.
+
+This script can also be run silent by using the following command:
+[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::SecurityProtocol -bor 3072; &([scriptblock]::Create((Invoke-WebRequest -useb 'https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/Scripts/Powershell/FirewallClean.ps1'))) -Silent:$true
 "@
 
 $infoText
