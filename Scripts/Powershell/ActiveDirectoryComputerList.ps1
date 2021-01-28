@@ -1,5 +1,7 @@
 #Requires -RunAsAdministrator
 
+Clear-Host
+
 # Company Name
 #Read-Host $sCompanyName = 'Enter Company Name'
 
