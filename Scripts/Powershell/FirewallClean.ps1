@@ -97,7 +97,4 @@ if ($Silent) {
     }
 }
 
-
-
-
 $UserInput = $Host.UI.ReadLine()
