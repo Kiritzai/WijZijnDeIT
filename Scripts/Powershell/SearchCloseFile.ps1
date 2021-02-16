@@ -9,7 +9,6 @@ if ($input) {
 
     If ($files.Count -eq 0) {
         Write-Host "No results found..."
-        $UserInput = $Host.UI.ReadLine()
     } else {
         Write-Host "Found Total: $($files.Count)"
         Write-Host ""
@@ -36,3 +35,5 @@ if ($input) {
         Write-Host "ShareRelativePath: $($files[$number-1].ShareRelativePath)"
     }
 }
+
+$UserInput = $Host.UI.ReadLine()
