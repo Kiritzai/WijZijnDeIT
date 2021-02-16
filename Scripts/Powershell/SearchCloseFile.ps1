@@ -2,6 +2,8 @@ $input = Read-Host -Prompt 'Filename to search'
 
 Clear-Host
 
+Write-Host "Searching for: $($input)"
+
 if ($input) {
     $files = Get-SMBOpenFile | Where-Object -Property Path -Match "$input" | Select-Object -Property ClientUserName,ClientComputerName,ShareRelativePath,FileId,SessionId,Path
 
