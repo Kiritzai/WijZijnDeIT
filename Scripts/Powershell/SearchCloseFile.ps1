@@ -7,9 +7,8 @@ Write-Host "Searching for: $($input)"
 if ($input) {
     $files = Get-SMBOpenFile | Where-Object -Property Path -Match "$input" | Select-Object -Property ClientUserName,ClientComputerName,ShareRelativePath,FileId,SessionId,Path
 
-    #Write-Host $input
-
-    If ($files.Count -eq 0) {
+    If ([string]::IsNullOrWhitespace($files.Count) -or $files.Count -eq '0') {
+        Write-Host ""
         Write-Host "No results found..."
     } else {
         Write-Host "Found Total: $($files.Count)"
