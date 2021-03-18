@@ -33,8 +33,8 @@ $xlfile = "$env:TEMP\ComputersGeneratedList.xlsx"
 Remove-Item $xlfile -ErrorAction SilentlyContinue
 
 # Get Computers
-Get-ADComputer -Filter  {OperatingSystem -notLike '*SERVER*' } -Properties lastlogondate,operatingsystem,OperatingSystemVersion,Description,Enabled,IPv4Address,Created |
-Select-Object name,lastlogondate,operatingsystem,OperatingSystemVersion,Description,Enabled,IPv4Address,Created |
+Get-ADComputer -Filter  {OperatingSystem -notLike '*SERVER*' } -Properties lastlogondate,operatingsystem,OperatingSystemVersion,Description,Enabled,IPv4Address,Created,serialNumber |
+Select-Object name,lastlogondate,operatingsystem,OperatingSystemVersion,Description,Enabled,IPv4Address,Created,@{N="serialNumber";E={$_.serialNumber -join ","}} |
 Sort-Object lastlogondate | Export-Excel $xlfile -AutoSize -FreezeTopRow -StartRow 1 -TableName ReportProcess
 
 $result = @"

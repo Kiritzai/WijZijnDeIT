@@ -23,14 +23,11 @@ It can cause problems with login/logout proccess of a session.
 
 This script can also be run silent by using the following command:
 [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::SecurityProtocol -bor 3072; &([scriptblock]::Create((Invoke-WebRequest -useb 'https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/Scripts/Powershell/FirewallClean.ps1'))) -Silent:$true
+
+Getting all Firewall Rules... ( This can take a while )
 "@
 
 $infoText
-
-Write-Host ""
-Write-Host ""
-Write-Host "Getting all Firewall Rules... ( This can take a while )"
-Write-Host ""
 
 $FWInboundRules       = Get-NetFirewallRule -Direction Inbound | Where-Object {$_.Owner -ne $Null} | Sort-Object Displayname, Owner
 $FWInboundRulesUnique = Get-NetFirewallRule -Direction Inbound | Where-Object {$_.Owner -ne $Null} | Sort-Object Displayname, Owner -Unique
