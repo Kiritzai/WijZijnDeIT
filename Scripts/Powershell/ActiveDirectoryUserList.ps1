@@ -19,8 +19,6 @@ if ((Get-CimInstance -ClassName CIM_OperatingSystem).Caption -match 'Windows 10'
     if($rsatAD.Installed -eq "False") { Install-WindowsFeature -Name RSAT-AD-PowerShell }
 }
 
-
-
 $modules = @("ImportExcel")
 
 foreach ($module in $modules) {
@@ -30,17 +28,15 @@ foreach ($module in $modules) {
     }
 }
 
-#Get-ADComputer -Filter  {OperatingSystem -notLike '*SERVER*' } -Properties lastlogondate,operatingsystem,OperatingSystemVersion | select name,lastlogondate,operatingsystem,OperatingSystemVersion | Export-Csv C:\Temp\users.csv
-
 # Get domain
 #$sDomain = (Get-ADDomain).Forest
 
-$xlfile = "$env:TEMP\ComputersGeneratedList.xlsx"
+$xlfile = "$env:TEMP\UsersGeneratedList.xlsx"
 Remove-Item $xlfile -ErrorAction SilentlyContinue
 
 # Get Computers
-Get-ADComputer -Filter  {OperatingSystem -notLike '*SERVER*' } -Properties lastlogondate,operatingsystem,OperatingSystemVersion,Description,Enabled,IPv4Address,Created,serialNumber |
-Select-Object name,lastlogondate,operatingsystem,OperatingSystemVersion,Description,Enabled,IPv4Address,Created,@{N="serialNumber";E={$_.serialNumber -join ","}} |
+Get-ADUser -Filter * -Properties name,lastlogondate,Description,Enabled,Created,DistinguishedName |
+Select-Object name,lastlogondate,Description,Enabled,Created,DistinguishedName |
 Sort-Object lastlogondate | Export-Excel $xlfile -AutoSize -FreezeTopRow -StartRow 1 -TableName ReportProcess
 
 $result = @"

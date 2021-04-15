@@ -18,8 +18,9 @@ function Show-Menu
     $textMenu = @"
 ================ $Title ================
 Press '1' for ActiveDirectory Testing Credentials
-Press '2' for ActiveDirectory Generating Computer List 
-Press '3' for Cleaning Windows Firqewall Rules for RDS Servers"
+Press '2' for ActiveDirectory Generating User List"
+Press '3' for ActiveDirectory Generating Computer List
+Press '4' for Cleaning Windows Firewall Rules for RDS Servers"
 ============================================================
 
 Press 'c' for Creating a shortcut of this menu on desktop"
@@ -39,8 +40,9 @@ do
     switch ($selection)
     {
         '1' { $script = "Scripts/Powershell/ActiveDirectoryTestCredentials.ps1" }
-        '2' { $script = "Scripts/Powershell/ActiveDirectoryComputerList.ps1" }
-        '3' { $script = "Scripts/Powershell/FirewallClean.ps1" }
+        '2' { $script = "Scripts/Powershell/ActiveDirectoryUserList.ps1" }
+        '3' { $script = "Scripts/Powershell/ActiveDirectoryComputerList.ps1" }
+        '4' { $script = "Scripts/Powershell/FirewallClean.ps1" }
         'c' { $script = "Scripts/Powershell/CreateShortcut.ps1" }
     }
 
