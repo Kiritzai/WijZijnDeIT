@@ -21,8 +21,10 @@ Press '1' for ActiveDirectory Testing Credentials
 Press '2' for ActiveDirectory Generating Computer List 
 Press '3' for Cleaning Windows Firewall Rules for RDS Servers"
 ============================================================
+
 Press 'c' for Creating a shortcut of this menu on desktop"
 Press 'q' to quit.
+
 "@
 $textMenu    
 
