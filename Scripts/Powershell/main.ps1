@@ -41,14 +41,7 @@ do
         '1' { $script = "Scripts/Powershell/ActiveDirectoryTestCredentials.ps1" }
         '2' { $script = "Scripts/Powershell/ActiveDirectoryComputerList.ps1" }
         '3' { $script = "Scripts/Powershell/FirewallClean.ps1" }
-        'c' { $DesktopPath = [Environment]::GetFolderPath("Desktop")
-              $DesktopPath = Join-Path "$DesktopPath" "WijZijnDeIT.lnk"
-              $WshShell = New-Object -comObject WScript.Shell
-              $Shortcut = $WshShell.CreateShortcut($DesktopPath)
-              $Shortcut.TargetPath = "powershell.exe"
-              $Shortcut.Arguments = "-NoExit -NoProfile -ExecutionPolicy Bypass -Command `"Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/Scripts/Powershell/main.ps1'))"
-              $Shortcut.Save()
-            }
+        'c' { $script = "Scripts/Powershell/CreateShortcut.ps1" }
     }
 
     if ($selection -ne 'q') {
