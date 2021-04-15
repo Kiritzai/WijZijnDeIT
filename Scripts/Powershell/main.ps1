@@ -20,6 +20,8 @@ function Show-Menu
 Press '1' for ActiveDirectory Testing Credentials
 Press '2' for ActiveDirectory Generating Computer List 
 Press '3' for Cleaning Windows Firewall Rules for RDS Servers"
+============================================================
+Press 'c' for Creating a shortcut of this menu on desktop"
 Press 'q' to quit.
 "@
 $textMenu    
@@ -39,6 +41,16 @@ do
         '3' { $script = "Scripts/Powershell/FirewallClean.ps1" }
     }
     
+    if ($selection -ne 'c') {
+        $DesktopPath = [Environment]::GetFolderPath("Desktop")
+        $DesktopPath = Join-Path "$DesktopPath" "WijZijnDeIT.lnk"
+        $WshShell = New-Object -comObject WScript.Shell
+        $Shortcut = $WshShell.CreateShortcut($DesktopPath)
+        $Shortcut.TargetPath = "powershell.exe"
+        $Shortcut.Arguments = "-NoExit -NoProfile -ExecutionPolicy Bypass -Command `"Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/Scripts/Powershell/main.ps1'))"
+        $Shortcut.Save()
+    }
+
     if ($selection -ne 'q') {
         [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::SecurityProtocol -bor 3072; &([scriptblock]::Create((Invoke-WebRequest -DisableKeepAlive -useb "https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/$script")))
     }
