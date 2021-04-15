@@ -35,8 +35,8 @@ $xlfile = "$env:TEMP\UsersGeneratedList.xlsx"
 Remove-Item $xlfile -ErrorAction SilentlyContinue
 
 # Get Computers
-Get-ADUser -Filter * -Properties name,lastlogondate,Description,Enabled,Created,DistinguishedName |
-Select-Object name,lastlogondate,Description,Enabled,Created,DistinguishedName |
+Get-ADUser -Filter * -Properties sAMAccountName,name,mail,title,userPrincipalName,lastlogondate,Description,Enabled,Created,DistinguishedName |
+Select-Object sAMAccountName,name,mail,title,userPrincipalName,lastlogondate,Description,Enabled,Created,DistinguishedName |
 Sort-Object lastlogondate | Export-Excel $xlfile -AutoSize -FreezeTopRow -StartRow 1 -TableName ReportProcess
 
 $result = @"
