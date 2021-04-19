@@ -12,7 +12,7 @@ Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 # Installing Modules
 #
 if ((Get-CimInstance -ClassName CIM_OperatingSystem).Caption -match 'Windows 10') {
-    Get-WindowsCapability -Online |? {$_.Name -like "Rsat.ActiveDirectory.DS-LDS.Tools*" -and $_.State -eq "NotPresent"} | Add-WindowsCapability -Online
+    Get-WindowsCapability -Online | Where-Object {$_.Name -like "Rsat.ActiveDirectory.DS-LDS.Tools*" -and $_.State -eq "NotPresent"} | Add-WindowsCapability -Online
 } else {
     Import-Module ServerManager
     $rsatAD = Get-WindowsFeature | Where-Object {$_.Name -eq "RSAT-AD-PowerShell"}
