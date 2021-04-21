@@ -13,20 +13,30 @@
 ## Clean Console
 ####
 Clear-Host
+Write-Host ""
 
 ####
-## Install required nuGet package
+## Install required packages
 ####
 if ((Get-PackageProvider -Name NuGet).Version -lt '2.8.5.201' ) {
-    Write-Host ""
     Write-Host "Installing nuGet package..."
     Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -Scope CurrentUser | Out-Null
 }
 
+if ((Get-CimInstance -ClassName CIM_OperatingSystem).Caption -match 'Windows 10') {
+    Write-Host "Installing Active Directory Tools"
+    Get-WindowsCapability -Online | Where-Object {$_.Name -like "Rsat.ActiveDirectory.DS-LDS.Tools*" -and $_.State -eq "NotPresent"} | Add-WindowsCapability -Online | Out-Null
+} else {
+    Import-Module ServerManager
+    $rsatAD = Get-WindowsFeature | Where-Object {$_.Name -eq "RSAT-AD-PowerShell"}
+    if($rsatAD.Installed -eq "False") { Install-WindowsFeature -Name RSAT-AD-PowerShell }
+}
+
+
 ####
 ## Settings
 ####
-(Get-Host).UI.RawUI.WindowTitle = ":: WijZijnDe.IT :: Power Menu :: V0.0.0.2 ::"
+(Get-Host).UI.RawUI.WindowTitle = ":: WijZijnDe.IT :: Power Menu :: V0.0.0.3 ::"
 
 function Show-Menu
 {

@@ -4,17 +4,6 @@ Clear-Host
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-#
-# Installing Modules
-#
-if ((Get-CimInstance -ClassName CIM_OperatingSystem).Caption -match 'Windows 10') {
-    Add-WindowsCapability –online –Name "Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0"
-} else {
-    Import-Module ServerManager
-    $rsatAD = Get-WindowsFeature | Where-Object {$_.Name -eq "RSAT-AD-PowerShell"}
-    if($rsatAD.Installed -eq "False") { Install-WindowsFeature -Name RSAT-AD-PowerShell }
-}
-
 $modules = @("ImportExcel")
 
 foreach ($module in $modules) {
