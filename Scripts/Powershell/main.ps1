@@ -14,6 +14,7 @@
 ####
 Clear-Host
 Write-Host ""
+Write-Host "Loading please wait..."
 
 ####
 ## Install required packages
