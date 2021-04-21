@@ -10,6 +10,20 @@
 #
 
 ####
+## Clean Console
+####
+Clear-Host
+
+####
+## Install required nuGet package
+####
+if ((Get-PackageProvider -Name NuGet).Version -lt '2.8.5.201' ) {
+    Write-Host ""
+    Write-Host "Installing nuGet package..."
+    Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -Scope CurrentUser | Out-Null
+}
+
+####
 ## Settings
 ####
 (Get-Host).UI.RawUI.WindowTitle = ":: WijZijnDe.IT :: Power Menu :: V0.0.0.1 ::"

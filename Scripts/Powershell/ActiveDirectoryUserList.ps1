@@ -2,11 +2,7 @@
 
 Clear-Host
 
-# Company Name
-#Read-Host $sCompanyName = 'Enter Company Name'
-
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 
 #
 # Installing Modules
@@ -31,7 +27,6 @@ foreach ($module in $modules) {
 }
 
 # Get domain
-#$sDomain = (Get-ADDomain).Forest
 $sDistDomain = (Get-ADDomain).DistinguishedName
 $sDistDomain = "*CN=Users,$sDistDomain"
 
