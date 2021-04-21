@@ -25,20 +25,24 @@ foreach ($module in $modules) {
     if ( -Not (Get-Module -ListAvailable -Name $module)) {
         Write-Host "Installing $module module..."
         Install-Module -Name $module -Force
+    } else {
+        Import-Module $module
     }
 }
 
 # Get domain
 #$sDomain = (Get-ADDomain).Forest
+$sDistDomain = (Get-ADDomain).DistinguishedName
+$sDistDomain = "*CN=Users,$sDistDomain"
 
 $xlfile = "$env:TEMP\UsersGeneratedList.xlsx"
 Remove-Item $xlfile -ErrorAction SilentlyContinue
 
 # Get Computers
 Get-ADUser -Filter * -Properties sAMAccountName,name,mail,title,userPrincipalName,lastlogondate,Enabled,Created,DistinguishedName,Description |
-Where-Object {$_.info -notmatch "System Account"} |
+Where-Object { $_.DistinguishedName -notlike "$sDistDomain" } |
 Select-Object sAMAccountName,name,mail,title,userPrincipalName,lastlogondate,Description,Enabled,Created,DistinguishedName,Description |
-Sort-Object lastlogondate | Export-Excel $xlfile -AutoSize -FreezeTopRow -StartRow 1 -TableName ReportProcess
+Sort-Object lastlogondate | Export-Excel $xlfile -AutoSize -BoldTopRow -FreezeTopRow -StartRow 1 -TableName ReportProcess
 
 $result = @"
 File has been generated and saved on the following location:
