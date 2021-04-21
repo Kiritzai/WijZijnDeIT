@@ -12,7 +12,7 @@
 ####
 ## Settings
 ####
-(Get-Host).UI.RawUI.WindowTitle = ":: WijZijnDe.IT :: Power Menu ::"
+(Get-Host).UI.RawUI.WindowTitle = ":: WijZijnDe.IT :: Power Menu :: V0.0.0.1 ::"
 
 function Show-Menu
 {
