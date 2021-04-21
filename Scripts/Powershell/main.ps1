@@ -26,7 +26,7 @@ if ((Get-PackageProvider -Name NuGet).Version -lt '2.8.5.201' ) {
 ####
 ## Settings
 ####
-(Get-Host).UI.RawUI.WindowTitle = ":: WijZijnDe.IT :: Power Menu :: V0.0.0.1 ::"
+(Get-Host).UI.RawUI.WindowTitle = ":: WijZijnDe.IT :: Power Menu :: V0.0.0.2 ::"
 
 function Show-Menu
 {
@@ -40,6 +40,7 @@ Press '1' for ActiveDirectory Testing Credentials
 Press '2' for ActiveDirectory Generating User List"
 Press '3' for ActiveDirectory Generating Computer List
 Press '4' for Cleaning Windows Firewall Rules for RDS Servers"
+Press '5' for Search and Close selected files"
 ============================================================
 
 Press 'c' for Creating a shortcut of this menu on desktop"
@@ -62,6 +63,7 @@ do
         '2' { $script = "Scripts/Powershell/ActiveDirectoryUserList.ps1" }
         '3' { $script = "Scripts/Powershell/ActiveDirectoryComputerList.ps1" }
         '4' { $script = "Scripts/Powershell/FirewallClean.ps1" }
+        '5' { $script = "Scripts/Powershell/SearchCloseFile.ps1" }
         'c' { $script = "Scripts/Powershell/CreateShortcut.ps1" }
     }
 
