@@ -24,7 +24,6 @@ if ((Get-PackageProvider -Name NuGet).Version -lt '2.8.5.201' ) {
 }
 
 if ((Get-CimInstance -ClassName CIM_OperatingSystem).Caption -match 'Windows 10') {
-    Write-Host "Installing Active Directory Tools"
     Get-WindowsCapability -Online | Where-Object {$_.Name -like "Rsat.ActiveDirectory.DS-LDS.Tools*" -and $_.State -eq "NotPresent"} | Add-WindowsCapability -Online | Out-Null
 } else {
     Import-Module ServerManager
@@ -57,7 +56,7 @@ $textMenu
 
 do
 {
-    (Get-Host).UI.RawUI.WindowTitle = ":: WijZijnDe.IT :: Power Menu :: V0.0.0.4 ::"
+    (Get-Host).UI.RawUI.WindowTitle = ":: WijZijnDe.IT :: Power Menu :: V0.0.0.5 ::"
 
     Clear-Variable script -ErrorAction SilentlyContinue
 

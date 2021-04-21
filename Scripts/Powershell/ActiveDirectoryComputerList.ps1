@@ -3,7 +3,7 @@
 ####
 ## Title
 ####
-(Get-Host).UI.RawUI.WindowTitle = ":: WijZijnDe.IT :: Power Menu :: V0.0.0.3 :: $MyInvocation.MyCommand.Name"
+(Get-Host).UI.RawUI.WindowTitle = ":: WijZijnDe.IT :: Power Menu :: V0.0.0.3 ::" + ([io.fileinfo]$MyInvocation.MyCommand.Definition).BaseName
 
 Clear-Host
 
