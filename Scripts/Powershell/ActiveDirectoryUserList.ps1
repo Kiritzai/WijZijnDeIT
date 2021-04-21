@@ -1,5 +1,10 @@
 #Requires -RunAsAdministrator
 
+####
+## Title
+####
+(Get-Host).UI.RawUI.WindowTitle = ":: WijZijnDe.IT :: Power Menu :: V0.0.0.3 :: $MyInvocation.MyCommand.Name"
+
 Clear-Host
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12

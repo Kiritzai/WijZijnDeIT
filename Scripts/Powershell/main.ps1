@@ -32,12 +32,6 @@ if ((Get-CimInstance -ClassName CIM_OperatingSystem).Caption -match 'Windows 10'
     if($rsatAD.Installed -eq "False") { Install-WindowsFeature -Name RSAT-AD-PowerShell }
 }
 
-
-####
-## Settings
-####
-(Get-Host).UI.RawUI.WindowTitle = ":: WijZijnDe.IT :: Power Menu :: V0.0.0.3 ::"
-
 function Show-Menu
 {
     param (
@@ -63,6 +57,8 @@ $textMenu
 
 do
 {
+    (Get-Host).UI.RawUI.WindowTitle = ":: WijZijnDe.IT :: Power Menu :: V0.0.0.4 ::"
+
     Clear-Variable script -ErrorAction SilentlyContinue
 
     Show-Menu -Title "WijZijnDe.IT"
