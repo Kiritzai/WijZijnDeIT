@@ -65,6 +65,7 @@ function disableWrites {
 }
 
 function changeCommands {
+
 	if grep -iRlq "EnableRemoteCommands=1" /etc/zabbix/zabbix_agentd.conf ; then
 		sed -i 's/EnableRemoteCommands=1/AllowKey=system.run[*]/g' /etc/zabbix/zabbix_agentd.conf
 	fi
@@ -77,9 +78,9 @@ function changeCommands {
 function installZabbixRepo {
 	find / -type f -name "zabbix.db" -delete
 	find / -type f -name "zabbix.list" -delete
-	wget https://repo.zabbix.com/zabbix/5.2/debian/pool/main/z/zabbix-release/zabbix-release_5.2-1+debian10_all.deb
-	dpkg -i --force-all -B zabbix-release_5.2-1+debian10_all.deb
-	rm -rf zabbix-release_5.2-1+debian10_all.deb
+	wget https://repo.zabbix.com/zabbix/5.4/debian/pool/main/z/zabbix-release/zabbix-release_5.4-1+debian10_all.deb
+	dpkg -i --force-all -B zabbix-release_5.4-1+debian10_all.deb
+	rm -rf zabbix-release_5.4-1+debian10_all.deb
 }
 
 function startServices {
