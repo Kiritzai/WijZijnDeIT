@@ -32,10 +32,15 @@ if ((Get-CimInstance -ClassName CIM_OperatingSystem).Caption -match 'Windows 10'
     if($rsatAD.Installed -eq "False") { Install-WindowsFeature -Name RSAT-AD-PowerShell }
 }
 
+
+
 function Show-Menu
 {
+    [cmdletbinding()]
     param (
-        [string]$Title = 'WijZijnDe.IT'
+        [string]$Title = "WijZijnDe.IT",
+        [string]$ncVer = "0.0.0.7",
+        [string]$foregroundcolor = "Green"
     )
     Clear-Host
     $textMenu = @"
@@ -43,38 +48,44 @@ function Show-Menu
 Press '1' for ActiveDirectory Testing Credentials
 Press '2' for ActiveDirectory Generating User List"
 Press '3' for ActiveDirectory Generating Computer List
-Press '4' for Cleaning Windows Firewall Rules for RDS Servers"
-Press '5' for Search and Close selected files"
+Press '4' for ActiveDirectory Users in Groups List
+Press '5' for Cleaning Windows Firewall Rules for RDS Servers"
+Press '6' for Search and Close selected files"
 ============================================================
 
 Press 'c' for Creating a shortcut of this menu on desktop"
 Press 'q' to quit.
 
 "@
-$textMenu    
+$textMenu
 
+    Write-Host `n"$Title v" $ncVer "#"`n -ForeGroundColor $foregroundcolor
+    Write-Host `n"Type 'q' or hit enter to drop to shell"`n
+    (Get-Host).UI.RawUI.WindowTitle = ":: WijZijnDe.IT :: Power Menu :: $ncVer ::"
+
+    do
+    {
+        (Get-Host).UI.RawUI.WindowTitle = ":: WijZijnDe.IT :: Power Menu :: V0.0.0.5 ::"
+
+        Clear-Variable script -ErrorAction SilentlyContinue
+
+        Show-Menu -Title "WijZijnDe.IT"
+        $selection = Read-Host "Please make a selection"
+        switch ($selection)
+        {
+            '1' { $script = "Scripts/Powershell/ActiveDirectoryTestCredentials.ps1" }
+            '2' { $script = "Scripts/Powershell/ActiveDirectoryUserList.ps1" }
+            '3' { $script = "Scripts/Powershell/ActiveDirectoryComputerList.ps1" }
+            '4' { $script = "Scripts/Powershell/ActiveDirectoryUsersinGroups.ps1" }
+            '5' { $script = "Scripts/Powershell/FirewallClean.ps1" }
+            '6' { $script = "Scripts/Powershell/SearchCloseFile.ps1" }
+            'c' { $script = "Scripts/Powershell/CreateShortcut.ps1" }
+        }
+
+        if ($selection -ne 'q') {
+            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::SecurityProtocol -bor 3072; &([scriptblock]::Create((Invoke-WebRequest -DisableKeepAlive -useb "https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/$script")))
+        }
+
+    } until ($selection -eq 'q')
 }
 
-do
-{
-    (Get-Host).UI.RawUI.WindowTitle = ":: WijZijnDe.IT :: Power Menu :: V0.0.0.5 ::"
-
-    Clear-Variable script -ErrorAction SilentlyContinue
-
-    Show-Menu -Title "WijZijnDe.IT"
-    $selection = Read-Host "Please make a selection"
-    switch ($selection)
-    {
-        '1' { $script = "Scripts/Powershell/ActiveDirectoryTestCredentials.ps1" }
-        '2' { $script = "Scripts/Powershell/ActiveDirectoryUserList.ps1" }
-        '3' { $script = "Scripts/Powershell/ActiveDirectoryComputerList.ps1" }
-        '4' { $script = "Scripts/Powershell/FirewallClean.ps1" }
-        '5' { $script = "Scripts/Powershell/SearchCloseFile.ps1" }
-        'c' { $script = "Scripts/Powershell/CreateShortcut.ps1" }
-    }
-
-    if ($selection -ne 'q') {
-        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::SecurityProtocol -bor 3072; &([scriptblock]::Create((Invoke-WebRequest -DisableKeepAlive -useb "https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/$script")))
-    }
-
-} until ($selection -eq 'q')
