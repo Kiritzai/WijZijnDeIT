@@ -55,7 +55,7 @@ function Show-Menu
     param (
         [string]$foregroundcolor = "Green"
     )
-    Clear-Host
+    #Clear-Host
     Write-Host `n"# $Title v" $ncVer "#"`n -ForeGroundColor $foregroundcolor
     $textMenu = @"
 ================ $Title ================
