@@ -35,9 +35,12 @@ if ((Get-PackageProvider -Name NuGet).Version -lt '2.8.5.208' ) {
     Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.208 -Force -Scope CurrentUser | Out-Null
 }
 
-if ((Get-CimInstance -ClassName CIM_OperatingSystem).Caption -match 'Windows 10') {
+if ((Get-CimInstance -ClassName CIM_OperatingSystem).Caption -like '*Windows 10*') {
+    Write-Host "Installing AD Tools"
     Get-WindowsCapability -Online | Where-Object {$_.Name -like "Rsat.ActiveDirectory.DS-LDS.Tools*" -and $_.State -eq "NotPresent"} | Add-WindowsCapability -Online | Out-Null
-} else {
+}
+
+if ((Get-CimInstance -ClassName CIM_OperatingSystem).Caption -like '*Windows Server*') {
     Write-Host "Installing AD Tools"
     Import-Module ServerManager
     $rsatAD = Get-WindowsFeature | Where-Object {$_.Name -eq "RSAT-AD-PowerShell"}
