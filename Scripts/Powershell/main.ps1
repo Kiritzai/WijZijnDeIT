@@ -89,3 +89,4 @@ $textMenu
     } until ($selection -eq 'q')
 }
 
+Show-Menu
