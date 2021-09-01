@@ -47,7 +47,7 @@ function Show-Menu
         [string]$foregroundcolor = "Green"
     )
     Clear-Host
-    Write-Host `n"$Title v" $ncVer "#"`n -ForeGroundColor $foregroundcolor
+    Write-Host `n"# $Title v" $ncVer "#"`n -ForeGroundColor $foregroundcolor
     $textMenu = @"
 ================ $Title ================
 Press '1' for ActiveDirectory Testing Credentials
