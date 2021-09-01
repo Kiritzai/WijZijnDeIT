@@ -43,6 +43,7 @@ function Show-Menu
         [string]$foregroundcolor = "Green"
     )
     Clear-Host
+    Write-Host `n"$Title v" $ncVer "#"`n -ForeGroundColor $foregroundcolor
     $textMenu = @"
 ================ $Title ================
 Press '1' for ActiveDirectory Testing Credentials
@@ -59,34 +60,29 @@ Press 'q' to quit.
 "@
 $textMenu
 
-    Write-Host `n"$Title v" $ncVer "#"`n -ForeGroundColor $foregroundcolor
-    Write-Host `n"Type 'q' or hit enter to drop to shell"`n
-    (Get-Host).UI.RawUI.WindowTitle = ":: WijZijnDe.IT :: Power Menu :: $ncVer ::"
-
-    do
-    {
-        (Get-Host).UI.RawUI.WindowTitle = ":: WijZijnDe.IT :: Power Menu :: V0.0.0.5 ::"
-
-        Clear-Variable script -ErrorAction SilentlyContinue
-
-        Show-Menu -Title "WijZijnDe.IT"
-        $selection = Read-Host "Please make a selection"
-        switch ($selection)
-        {
-            '1' { $script = "Scripts/Powershell/ActiveDirectoryTestCredentials.ps1" }
-            '2' { $script = "Scripts/Powershell/ActiveDirectoryUserList.ps1" }
-            '3' { $script = "Scripts/Powershell/ActiveDirectoryComputerList.ps1" }
-            '4' { $script = "Scripts/Powershell/ActiveDirectoryUsersinGroups.ps1" }
-            '5' { $script = "Scripts/Powershell/FirewallClean.ps1" }
-            '6' { $script = "Scripts/Powershell/SearchCloseFile.ps1" }
-            'c' { $script = "Scripts/Powershell/CreateShortcut.ps1" }
-        }
-
-        if ($selection -ne 'q') {
-            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::SecurityProtocol -bor 3072; &([scriptblock]::Create((Invoke-WebRequest -DisableKeepAlive -useb "https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/$script")))
-        }
-
-    } until ($selection -eq 'q')
 }
 
-Show-Menu
+do
+{
+    (Get-Host).UI.RawUI.WindowTitle = ":: WijZijnDe.IT :: Power Menu :: $ncVer ::"
+
+    Clear-Variable script -ErrorAction SilentlyContinue
+
+    Show-Menu
+    $selection = Read-Host "Please make a selection"
+    switch ($selection)
+    {
+        '1' { $script = "Scripts/Powershell/ActiveDirectoryTestCredentials.ps1" }
+        '2' { $script = "Scripts/Powershell/ActiveDirectoryUserList.ps1" }
+        '3' { $script = "Scripts/Powershell/ActiveDirectoryComputerList.ps1" }
+        '4' { $script = "Scripts/Powershell/ActiveDirectoryUsersinGroups.ps1" }
+        '5' { $script = "Scripts/Powershell/FirewallClean.ps1" }
+        '6' { $script = "Scripts/Powershell/SearchCloseFile.ps1" }
+        'c' { $script = "Scripts/Powershell/CreateShortcut.ps1" }
+    }
+
+    if ($selection -ne 'q') {
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::SecurityProtocol -bor 3072; &([scriptblock]::Create((Invoke-WebRequest -DisableKeepAlive -useb "https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/$script")))
+    }
+
+} until ($selection -eq 'q')
