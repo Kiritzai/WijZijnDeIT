@@ -44,7 +44,7 @@ if ((Get-CimInstance -ClassName CIM_OperatingSystem).Caption -like '*Windows Ser
     Write-Host "Installing AD Tools"
     Import-Module ServerManager
     $rsatAD = Get-WindowsFeature | Where-Object {$_.Name -eq "RSAT-AD-PowerShell"}
-    if($rsatAD.Installed -eq "False") { Install-WindowsFeature -Name RSAT-AD-PowerShell }
+    if(!$rsatAD.Installed) { Install-WindowsFeature -Name RSAT-AD-PowerShell }
 }
 
 
