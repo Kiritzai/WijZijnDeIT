@@ -25,9 +25,13 @@ Write-Host "Loading please wait..."
 ####
 ## Install required packages
 ####
-if ((Get-PackageProvider -Name NuGet).Version -lt '2.8.5.208' ) {
+$packageProviders = Get-PackageProvider | select name
+if(!($packageProviders.name -contains "nuget")) {
     Write-Host "Installing nuGet package..."
-    #Install-PackageProvider -Name NuGet -Force | Out-Null
+    Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.208 -Force -Scope CurrentUser | Out-Null
+}
+
+if ((Get-PackageProvider -Name NuGet).Version -lt '2.8.5.208' ) {
     Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.208 -Force -Scope CurrentUser | Out-Null
 }
 
