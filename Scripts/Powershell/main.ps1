@@ -9,6 +9,12 @@
 # Set-ExecutionPolicy Bypass -Scope Process -Force; [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::SecurityProtocol -bor 3072; &([scriptblock]::Create((Invoke-WebRequest -DisableKeepAlive -useb 'https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/Scripts/Powershell/main.ps1')))
 #
 
+###
+# Variables
+###
+[string]$ncVer = "0.0.0.7"
+[string]$Title = "WijZijnDe.IT"
+
 ####
 ## Clean Console
 ####
@@ -38,8 +44,6 @@ function Show-Menu
 {
     [cmdletbinding()]
     param (
-        [string]$Title = "WijZijnDe.IT",
-        [string]$ncVer = "0.0.0.7",
         [string]$foregroundcolor = "Green"
     )
     Clear-Host
@@ -47,14 +51,14 @@ function Show-Menu
     $textMenu = @"
 ================ $Title ================
 Press '1' for ActiveDirectory Testing Credentials
-Press '2' for ActiveDirectory Generating User List"
+Press '2' for ActiveDirectory Generating User List
 Press '3' for ActiveDirectory Generating Computer List
 Press '4' for ActiveDirectory Users in Groups List
-Press '5' for Cleaning Windows Firewall Rules for RDS Servers"
-Press '6' for Search and Close selected files"
+Press '5' for Cleaning Windows Firewall Rules for RDS Servers
+Press '6' for Search and Close selected files
 ============================================================
 
-Press 'c' for Creating a shortcut of this menu on desktop"
+Press 'c' for Creating a shortcut of this menu on desktop
 Press 'q' to quit.
 
 "@
