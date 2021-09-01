@@ -27,7 +27,8 @@ Write-Host "Loading please wait..."
 ####
 if ((Get-PackageProvider -Name NuGet).Version -lt '2.8.5.201' ) {
     Write-Host "Installing nuGet package..."
-    Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -Scope CurrentUser | Out-Null
+    Install-PackageProvider -Name NuGet -Force | Out-Null
+    #Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -Scope CurrentUser | Out-Null
 }
 
 if ((Get-CimInstance -ClassName CIM_OperatingSystem).Caption -match 'Windows 10') {
