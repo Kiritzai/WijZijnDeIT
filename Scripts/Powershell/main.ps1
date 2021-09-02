@@ -22,7 +22,7 @@ If (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 ###
 # Variables
 ###
-[string]$ncVer = "0.0.0.9"
+[string]$ncVer = "0.0.1.0"
 [string]$Title = "WijZijnDe.IT"
 
 ####
