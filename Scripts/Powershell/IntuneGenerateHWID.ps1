@@ -10,7 +10,7 @@ $sn = (Get-WmiObject win32_bios).SerialNumber
 $pcname = $env:COMPUTERNAME
 $file = $pcname + "_" + $sn
 New-Item -Path c:\HWID -ItemType Directory -Force -Confirm:$false | out-null
-C:\ProgramData\CustomScripts\Get-WindowsAutoPilotInfo.ps1 -OutputFile c:\HWID\$file.csv
+C:\ProgramData\CustomScripts\Get-WindowsAutoPilotInfo.ps1 -Scope CurrentUser -OutputFile c:\HWID\$file.csv
 
 Write-Host "HWID Generated!"
 
