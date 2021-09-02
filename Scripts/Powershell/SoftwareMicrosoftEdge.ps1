@@ -1,7 +1,7 @@
 # Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072;
 
-# Security
-[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+
+Clear-Host
 
 #OPTIONAL CONFIGURATION:
 $jsonUrl = "https://edgeupdates.microsoft.com/api/products"
@@ -38,7 +38,7 @@ function runProcess ($exectable, $params, $windowStyle=1) {
 try {
 #    if (!$isOnedriveInstalled -and $downloadURL) {
         Write-Output "downloading from download URL: $downloadUrl"
-        Invoke-WebRequest -UseBasicParsing -Uri $downloadUrl -Method GET -OutFile $temporaryInstallerPath | out-null
+        Invoke-WebRequest -UseBasicParsing -Uri $downloadUrl -Method GET -OutFile $temporaryInstallerPath
         Write-Output "downloaded finished from download URL: $downloadUrl"
         if([System.IO.File]::Exists($temporaryInstallerPath)){
             Write-Output "Starting client installer"
