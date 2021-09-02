@@ -58,21 +58,21 @@ function Show-Menu
     Clear-Host
     Write-Host `n"# $Title v" $ncVer "#"`n -ForeGroundColor $foregroundcolor
     $textMenu = @"
-================ General ================
+=========================== General ============================
 Press 'G1' for Cleaning Windows Firewall Rules for RDS Servers
 Press 'G2' for Search and Close selected files
-=========================================
+================================================================
 
-================ Active Directory ================
+======================= Active Directory =======================
 Press 'A1' for ActiveDirectory Testing Credentials
 Press 'A2' for ActiveDirectory Generating User List
 Press 'A3' for ActiveDirectory Generating Computer List
 Press 'A4' for ActiveDirectory Users in Groups List
-==================================================
+================================================================
 
-================ Software ================
+=========================== Software ===========================
 Press 'S1' for Installing Microsoft Edge
-==========================================
+================================================================
 
 Press 'c' for Creating a shortcut of this menu on desktop
 Press 'q' to quit.
