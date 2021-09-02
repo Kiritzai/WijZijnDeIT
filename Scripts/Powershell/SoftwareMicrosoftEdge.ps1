@@ -3,6 +3,8 @@
 
 Clear-Host
 
+Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Name "DisableFirstRunCustomize" -Value 2
+
 #OPTIONAL CONFIGURATION:
 $jsonUrl = "https://edgeupdates.microsoft.com/api/products"
 $temporaryInstallerPath = Join-Path $Env:TEMP -ChildPath "InstallMicrosoftEdge.msi"
@@ -38,8 +40,8 @@ function runProcess ($exectable, $params, $windowStyle=1) {
 try {
 #    if (!$isOnedriveInstalled -and $downloadURL) {
         Write-Host "downloading from download URL: $downloadUrl"
-        Invoke-WebRequest -UseBasicParsing -Uri $downloadUrl -Method GET -OutFile $temporaryInstallerPath
-        Write-Output "downloaded finished from download URL: $downloadUrl"
+        Invoke-WebRequest -Uri $downloadUrl -Method GET -UseBasicParsing -OutFile $temporaryInstallerPath | Out-Null
+        Write-Host "downloaded finished from download URL: $downloadUrl"
         if([System.IO.File]::Exists($temporaryInstallerPath)){
             Write-Host "Starting client installer"
             Start-Sleep -s 5 #let A/V scan the file so it isn't locked
@@ -49,7 +51,7 @@ try {
             runProcess "C:\Windows\System32\msiexec.exe" "/i $temporaryInstallerPath /passive"
             Start-Sleep -s 5
             Write-Host "Install finished"
-            Remove-Item -Path $temporaryInstallerPath | out-null
+            Remove-Item -Path $temporaryInstallerPath | Out-Null
             Write-Host "File removed from: $temporaryInstallerPath"
         }
     #}
