@@ -4,7 +4,7 @@ Clear-Host
 Write-Host `n"Generating HWID.."
 
 New-Item -Path c:\programdata\customscripts -ItemType Directory -Force -Confirm:$false | out-null
-Install-PackageProvider -name nuget -minimumversion 2.8.5.201 -force | out-null
+Install-PackageProvider -name nuget -minimumversion 2.8.5.200 -Force -Scope CurrentUser | out-null
 Save-Script -Name Get-WindowsAutoPilotInfo -Path c:\ProgramData\CustomScripts -force | out-null
 $sn = (Get-WmiObject win32_bios).SerialNumber
 $pcname = $env:COMPUTERNAME
