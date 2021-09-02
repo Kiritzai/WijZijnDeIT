@@ -12,7 +12,7 @@
 ###
 # Variables
 ###
-[string]$ncVer = "0.0.0.8"
+[string]$ncVer = "0.0.0.9"
 [string]$Title = "WijZijnDe.IT"
 
 ####

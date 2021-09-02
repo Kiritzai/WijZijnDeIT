@@ -17,5 +17,5 @@ Write-Host "HWID Generated!"
 # Opens the folder
 explorer "c:\HWID"
 
-Write-Host `n"Continue?"
+Write-Host `n"Continue..."
 $UserInput = $Host.UI.ReadLine()
