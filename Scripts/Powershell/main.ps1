@@ -58,14 +58,21 @@ function Show-Menu
     Clear-Host
     Write-Host `n"# $Title v" $ncVer "#"`n -ForeGroundColor $foregroundcolor
     $textMenu = @"
-================ $Title ================
-Press '1' for ActiveDirectory Testing Credentials
-Press '2' for ActiveDirectory Generating User List
-Press '3' for ActiveDirectory Generating Computer List
-Press '4' for ActiveDirectory Users in Groups List
-Press '5' for Cleaning Windows Firewall Rules for RDS Servers
-Press '6' for Search and Close selected files
-============================================================
+================ General ================
+Press 'G1' for Cleaning Windows Firewall Rules for RDS Servers
+Press 'G2' for Search and Close selected files
+=========================================
+
+================ Active Directory ================
+Press 'A1' for ActiveDirectory Testing Credentials
+Press 'A2' for ActiveDirectory Generating User List
+Press 'A3' for ActiveDirectory Generating Computer List
+Press 'A4' for ActiveDirectory Users in Groups List
+==================================================
+
+================ Software ================
+Press 'S1' for Installing Microsoft Edge
+==========================================
 
 Press 'c' for Creating a shortcut of this menu on desktop
 Press 'q' to quit.
@@ -85,12 +92,13 @@ do
     $selection = Read-Host "Please make a selection"
     switch ($selection)
     {
-        '1' { $script = "Scripts/Powershell/ActiveDirectoryTestCredentials.ps1" }
-        '2' { $script = "Scripts/Powershell/ActiveDirectoryUserList.ps1" }
-        '3' { $script = "Scripts/Powershell/ActiveDirectoryComputerList.ps1" }
-        '4' { $script = "Scripts/Powershell/ActiveDirectoryUsersinGroups.ps1" }
-        '5' { $script = "Scripts/Powershell/FirewallClean.ps1" }
-        '6' { $script = "Scripts/Powershell/SearchCloseFile.ps1" }
+        'G1' { $script = "Scripts/Powershell/FirewallClean.ps1" }
+        'G2' { $script = "Scripts/Powershell/SearchCloseFile.ps1" }
+        'A1' { $script = "Scripts/Powershell/ActiveDirectoryTestCredentials.ps1" }
+        'A2' { $script = "Scripts/Powershell/ActiveDirectoryUserList.ps1" }
+        'A3' { $script = "Scripts/Powershell/ActiveDirectoryComputerList.ps1" }
+        'A4' { $script = "Scripts/Powershell/ActiveDirectoryUsersinGroups.ps1" }
+        'S1' { $script = "Scripts/Powershell/ActiveDirectoryUsersinGroups.ps1" }
         'c' { $script = "Scripts/Powershell/CreateShortcut.ps1" }
     }
 
