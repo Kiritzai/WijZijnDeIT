@@ -75,6 +75,10 @@ Press 'S1' for Installing Microsoft Edge
 Press 'S2' for Installing Microsoft OneDrive
 ================================================================
 
+======================= Microsoft Intune =======================
+Press 'M1' for Generating HWID File
+================================================================
+
 Press 'c' for Creating a shortcut of this menu on desktop
 Press 'q' to quit.
 
@@ -101,6 +105,7 @@ do
         'A4' { $script = "Scripts/Powershell/ActiveDirectoryUsersinGroups.ps1" }
         'S1' { $script = "Scripts/Powershell/SoftwareMicrosoftEdge.ps1" }
         'S2' { $script = "Scripts/Powershell/SoftwareOneDrive.ps1" }
+        'M1' { $script = "Scripts/Powershell/IntuneGenerateHWID.ps1" }
         'c' { $script = "Scripts/Powershell/CreateShortcut.ps1" }
     }
 
