@@ -39,20 +39,17 @@ function runProcess ($exectable, $params, $windowStyle=1) {
 #DOWNLOAD ONEDRIVE INSTALLER AND RUN IT
 try {
 #    if (!$isOnedriveInstalled -and $downloadURL) {
-        Write-Host "downloading from download URL: $downloadUrl"
+        Write-Host "Downloading Microsoft Edge"
         Invoke-WebRequest -Uri $downloadUrl -Method GET -UseBasicParsing -OutFile $temporaryInstallerPath | Out-Null
-        Write-Host "downloaded finished from download URL: $downloadUrl"
+        Write-Host "Microsoft Edge has been downloaded"
         if([System.IO.File]::Exists($temporaryInstallerPath)){
-            Write-Host "Starting client installer"
-            Start-Sleep -s 5 #let A/V scan the file so it isn't locked
-            #first kill existing instances
-            #Get-Process | Where-Object {$_.ProcessName -like "onedrive*"} | Stop-Process -Force -Confirm:$False
+            Write-Host "Installing Microsoft Edge..."
             Start-Sleep -s 5
-            runProcess "C:\Windows\System32\msiexec.exe" "/i $temporaryInstallerPath /passive"
+            runProcess "C:\Windows\System32\msiexec.exe" "/i $temporaryInstallerPath /qn"
             Start-Sleep -s 5
-            Write-Host "Install finished"
             Remove-Item -Path $temporaryInstallerPath | Out-Null
             Write-Host "File removed from: $temporaryInstallerPath"
+            Write-Host "Installation finished"
         }
     #}
 } catch {
@@ -60,5 +57,6 @@ try {
     Write-Error $_ -ErrorAction Continue
 }
 
+Write-Host `n"Press any key to continue..."
 
 $UserInput = $Host.UI.ReadLine()
