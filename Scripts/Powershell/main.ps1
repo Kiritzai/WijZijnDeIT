@@ -98,7 +98,7 @@ do
         'A2' { $script = "Scripts/Powershell/ActiveDirectoryUserList.ps1" }
         'A3' { $script = "Scripts/Powershell/ActiveDirectoryComputerList.ps1" }
         'A4' { $script = "Scripts/Powershell/ActiveDirectoryUsersinGroups.ps1" }
-        'S1' { $script = "Scripts/Powershell/ActiveDirectoryUsersinGroups.ps1" }
+        'S1' { $script = "Scripts/Powershell/SoftwareMicrosoftEdge.ps1" }
         'c' { $script = "Scripts/Powershell/CreateShortcut.ps1" }
     }
 
