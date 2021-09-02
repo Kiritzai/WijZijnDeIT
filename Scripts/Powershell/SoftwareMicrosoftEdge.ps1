@@ -37,20 +37,20 @@ function runProcess ($exectable, $params, $windowStyle=1) {
 #DOWNLOAD ONEDRIVE INSTALLER AND RUN IT
 try {
 #    if (!$isOnedriveInstalled -and $downloadURL) {
-        Write-Output "downloading from download URL: $downloadUrl"
+        Write-Host "downloading from download URL: $downloadUrl"
         Invoke-WebRequest -UseBasicParsing -Uri $downloadUrl -Method GET -OutFile $temporaryInstallerPath
         Write-Output "downloaded finished from download URL: $downloadUrl"
         if([System.IO.File]::Exists($temporaryInstallerPath)){
-            Write-Output "Starting client installer"
+            Write-Host "Starting client installer"
             Start-Sleep -s 5 #let A/V scan the file so it isn't locked
             #first kill existing instances
             #Get-Process | Where-Object {$_.ProcessName -like "onedrive*"} | Stop-Process -Force -Confirm:$False
             Start-Sleep -s 5
             runProcess "C:\Windows\System32\msiexec.exe" "/i $temporaryInstallerPath /passive"
             Start-Sleep -s 5
-            Write-Output "Install finished"
+            Write-Host "Install finished"
             Remove-Item -Path $temporaryInstallerPath | out-null
-            Write-Output "File removed from: $temporaryInstallerPath"
+            Write-Host "File removed from: $temporaryInstallerPath"
         }
     #}
 } catch {
