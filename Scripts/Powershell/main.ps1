@@ -72,6 +72,7 @@ Press 'A4' for ActiveDirectory Users in Groups List
 
 =========================== Software ===========================
 Press 'S1' for Installing Microsoft Edge
+Press 'S2' for Installing Microsoft OneDrive
 ================================================================
 
 Press 'c' for Creating a shortcut of this menu on desktop
@@ -99,6 +100,7 @@ do
         'A3' { $script = "Scripts/Powershell/ActiveDirectoryComputerList.ps1" }
         'A4' { $script = "Scripts/Powershell/ActiveDirectoryUsersinGroups.ps1" }
         'S1' { $script = "Scripts/Powershell/SoftwareMicrosoftEdge.ps1" }
+        'S2' { $script = "Scripts/Powershell/SoftwareOneDrive.ps1" }
         'c' { $script = "Scripts/Powershell/CreateShortcut.ps1" }
     }
 
