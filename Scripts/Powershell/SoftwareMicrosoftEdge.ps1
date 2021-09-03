@@ -49,6 +49,7 @@ try {
             Start-Sleep -s 5
             Remove-Item -Path $temporaryInstallerPath | Out-Null
             Write-Host "File removed from: $temporaryInstallerPath"
+            New-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Edge" -Name "HideFirstRunExperience" -Value 2 -PropertyType DWORD -Force | Out-Null
             Write-Host "Installation finished"
         }
     #}
