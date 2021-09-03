@@ -2,8 +2,8 @@ Clear-Host
 
 Write-Host ""
 
-#$DesktopPath = [Environment]::GetFolderPath("Desktop")
-$DesktopPath = [Environment]::GetFolderPath("CommonDesktopDirectory")
+$DesktopPath = [Environment]::GetFolderPath("Desktop")
+#$DesktopPath = [Environment]::GetFolderPath("CommonDesktopDirectory")
 $DesktopPath = Join-Path "$DesktopPath" "WijZijnDeIT.lnk"
 
 if (Test-Path -Path $DesktopPath -PathType Leaf) {
