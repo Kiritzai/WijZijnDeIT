@@ -16,9 +16,9 @@ if (Test-Path -Path $DesktopPath -PathType Leaf) {
     $Shortcut.Save()
     
     # Set RunAsAdministrator checkbox
-    $bytes = [System.IO.File]::ReadAllBytes($DesktopPath)
-    $bytes[0x15] = $bytes[0x15] -bor 0x20 #set byte 21 (0x15) bit 6 (0x20) ON
-    [System.IO.File]::WriteAllBytes($DesktopPath, $bytes)
+    #$bytes = [System.IO.File]::ReadAllBytes($DesktopPath)
+    #$bytes[0x15] = $bytes[0x15] -bor 0x20 #set byte 21 (0x15) bit 6 (0x20) ON
+    #[System.IO.File]::WriteAllBytes($DesktopPath, $bytes)
 
     Write-Host "Created file [$($DesktopPath)]"
 }
