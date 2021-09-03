@@ -28,6 +28,10 @@ $global:progressPreference = 'silentlyContinue'
 [string]$Title = "WijZijnDe.IT"
 
 
+# Disable first Run Explorer
+[microsoft.win32.registry]::SetValue("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Internet Explorer\Main", "DisableFirstRunCustomize", 2)
+
+
 ####
 ## Clean Console
 ####

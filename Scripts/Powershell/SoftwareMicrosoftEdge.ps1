@@ -3,7 +3,8 @@
 
 Clear-Host
 
-Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Name "DisableFirstRunCustomize" -Value 2
+# Disable first Run Explorer
+[microsoft.win32.registry]::SetValue("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Internet Explorer\Main", "DisableFirstRunCustomize", 2)
 
 #OPTIONAL CONFIGURATION:
 $jsonUrl = "https://edgeupdates.microsoft.com/api/products"
@@ -49,7 +50,7 @@ try {
             Start-Sleep -s 5
             Remove-Item -Path $temporaryInstallerPath | Out-Null
             Write-Host "File removed from: $temporaryInstallerPath"
-            New-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Edge" -Name "HideFirstRunExperience" -Value 2 -PropertyType DWORD -Force | Out-Null
+            [microsoft.win32.registry]::SetValue("HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Edge", "HideFirstRunExperience", 1)
             Write-Host "Installation finished"
         }
     #}
