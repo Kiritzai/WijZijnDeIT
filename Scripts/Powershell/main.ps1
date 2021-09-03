@@ -18,12 +18,17 @@
 #    Exit
 #}
 
+###
+# Globals
+###
+$global:progressPreference = 'silentlyContinue'
 
 ###
 # Variables
 ###
-[string]$ncVer = "0.0.1.0"
+[string]$ncVer = "0.0.1.1"
 [string]$Title = "WijZijnDe.IT"
+
 
 ####
 ## Clean Console
@@ -35,14 +40,9 @@ Write-Host "Loading please wait..."
 ####
 ## Install required packages
 ####
-$packageProviders = Get-PackageProvider | select name
-if(!($packageProviders.name -contains "nuget")) {
-    Write-Host "Installing nuGet package..."
-    Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.208 -Force -Scope CurrentUser | Out-Null
-}
-
-if ((Get-PackageProvider -Name NuGet).Version -lt '2.8.5.208' ) {
-    Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.208 -Force -Scope CurrentUser | Out-Null
+if((Get-PackageProvider | Select-Object name).name -notcontains "nuget" -or (Get-PackageProvider | Select-Object name,version | Where-Object {$_.Name -contains "nuget"}).Version -lt '2.8.5.208' ) {
+    Write-Host "Installing NuGet latest version"
+    Install-PackageProvider -name nuget -minimumversion 2.8.5.208 -Force -Scope CurrentUser | out-null
 }
 
 if ((Get-CimInstance -ClassName CIM_OperatingSystem).Caption -like '*Windows 10*') {
