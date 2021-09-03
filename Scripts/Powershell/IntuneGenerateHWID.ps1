@@ -39,7 +39,7 @@ if ($confirmation -eq 'y') {
     $p.StartInfo = $pinfo
     $p.Start() | Out-Null
     $p.WaitForExit()
-    Exit $p.ExitCode
+    $p.ExitCode
 
     Write-Host "HWID Generated!"
 
