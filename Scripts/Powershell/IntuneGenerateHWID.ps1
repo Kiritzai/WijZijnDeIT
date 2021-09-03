@@ -1,7 +1,7 @@
 
 Clear-Host
 
-If (([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+If (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
     Write-Host `n"!!Caution!!" -ForegroundColor Red
     Write-Host "This part will need administrator rights to continue!"`n
 }
