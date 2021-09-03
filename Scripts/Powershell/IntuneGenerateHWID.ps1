@@ -1,8 +1,10 @@
 
 Clear-Host
 
-Write-Host `n"!!Caution!!" -ForegroundColor Red
-Write-Host "This part will need administrator rights to continue!"`n
+If (([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+    Write-Host `n"!!Caution!!" -ForegroundColor Red
+    Write-Host "This part will need administrator rights to continue!"`n
+}
 
 $confirmation = Read-Host "Do you want to continue (y/n)"
 Write-Host ""
