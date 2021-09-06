@@ -18,7 +18,7 @@ function Start-ElevatedCode
 Clear-Host
 
 Write-Host `n"!!Caution!!" -ForegroundColor Red
-Write-Host "This part will need administrator rights to continue!"`n
+Write-Host "This part will need administrator rights to continue!`nAlso the computer will RESTART after these commands!"`n
 
 $confirmation = Read-Host "Do you want to continue (y/n)"
 Write-Host ""
@@ -28,10 +28,15 @@ if ($confirmation -eq 'y') {
     Clear-Host
 
     try {
-        #Start-ElevatedCode { Disable-TpmAutoProvisioning | Out-Null }
-        #Start-ElevatedCode { Initialize-Tpm -AllowClear $true }
+
+        Write-Host `n"Disable Auto Provisioning"
+        Start-ElevatedCode { Disable-TpmAutoProvisioning | Out-Null }
+
+        Write-Host "Initialize and Clear TPM"
+        Start-ElevatedCode { Initialize-Tpm -AllowClear $true | Out-Null }
         
-        Invoke-WebRequest -UseBasicParsing -Uri "https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/dell_tpm_upgrade.exe" -Method GET -OutFile "$env:TEMP\dell_tpm_upgrade.exe" | Out-Null
+        Write-Host "Downloading dell TPM upgrade tool"
+        Invoke-WebRequest -UseBasicParsing -Uri "https://github.com/Kiritzai/WijZijnDeIT/raw/master/Scripts/Powershell/dell_tpm_upgrade.exe" -Method GET -OutFile "$env:TEMP\dell_tpm_upgrade.exe" | Out-Null
 
         $script = @'
         Register-ScheduledTask -Action $(New-ScheduledTaskAction -Execute "$env:TEMP\dell_tpm_upgrade.exe" -Argument "/s /f"),
@@ -49,12 +54,15 @@ if ($confirmation -eq 'y') {
                                 -RunLevel Highest
 '@ | Out-File "$env:TEMP\Upgrade-TPM-Chip.ps1"
 
+        Write-Host "Creating scheduled task"
         Start-Sleep -Seconds 5
         Start-ElevatedCode { Start-Process powershell -WindowStyle Hidden -ArgumentList "$env:TEMP\Upgrade-TPM-Chip.ps1" }
 
         Remove-Item "$env:TEMP\Upgrade-TPM-Chip.ps1"
-
-        #Copy-Item "$env:TEMP\dell_tpm_upgrade.exe"
+        
+        Write-Host "Restarting computer...."
+        Start-Sleep -Seconds 5
+        Restart-Computer -Force
     }
     catch {
         Write-Host `n"Seems there is no TPM active or available."
