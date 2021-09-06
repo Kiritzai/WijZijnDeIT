@@ -87,8 +87,8 @@ Press 'S2' for Installing Microsoft OneDrive
 ================================================================
 
 ============================= TPM ==============================
-Press 'S1' for Getting TPM Version
-Press 'S2' for Reset and Upgrade TPM
+Press 'T1' for Getting TPM Version
+Press 'T2' for Reset and Upgrade TPM
 ================================================================
 
 ======================= Microsoft Intune =======================
