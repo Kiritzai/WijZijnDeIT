@@ -140,19 +140,20 @@ main () {
 }
 
 function changeSources {
-	apt clean
+	DEBIAN_FRONTEND=noninteractive apt clean
 	rm /etc/apt/sources.list
 	echo "deb http://ftp.debian.org/debian/ stable contrib main non-free" | tee /etc/apt/sources.list
 	echo "deb-src http://ftp.debian.org/debian/ stable contrib main non-free" | tee -a /etc/apt/sources.list
-	echo "deb http://security.debian.org/debian-security stable/updates contrib main non-free" | tee -a /etc/apt/sources.list
-	echo "deb-src http://security.debian.org/debian-security stable/updates contrib main non-free" | tee -a /etc/apt/sources.list
+	echo "deb http://security.debian.org/debian-security stable-security contrib main non-free" | tee -a /etc/apt/sources.list
+	echo "deb-src http://security.debian.org/debian-security stable-security contrib main non-free" | tee -a /etc/apt/sources.list
 	echo "deb http://ftp.debian.org/debian/ stable-updates contrib main non-free" | tee -a /etc/apt/sources.list
 	echo "deb-src http://ftp.debian.org/debian/ stable-updates contrib main non-free" | tee -a /etc/apt/sources.list
-	apt update
-	apt install --reinstall dpkg libc-bin -yq
-	apt update
-	apt upgrade -yq
-	apt autoremove -yq
+	#echo "deb http://deb.debian.org/debian stable-backports main" > /etc/apt/sources.list.d/backports.list
+	DEBIAN_FRONTEND=noninteractive apt update
+	DEBIAN_FRONTEND=noninteractive apt install --reinstall dpkg libc-bin -yqq
+	DEBIAN_FRONTEND=noninteractive apt update
+	DEBIAN_FRONTEND=noninteractive apt upgrade -yqq
+	DEBIAN_FRONTEND=noninteractive apt autoremove -yqq
 }
 
 function installUtilities {
@@ -172,19 +173,45 @@ function setSudo {
 function changeMotd {
 	rm -r /etc/update-motd.d/10-uname
 	sed -i "s/#PrintLastLog yes/PrintLastLog no/g" /etc/ssh/sshd_config
-	echo "###########################################" | tee /etc/motd
-	echo "###" | tee -a /etc/motd
-	if [ $openvpnInstall -eq 1 ]; then
-		echo "### WijZijnDe.IT OpenVPN Server" | tee -a /etc/motd
-	fi
-	if [ $zabbixInstall -eq 1 ]; then
-		echo "### WijZijnDe.IT Zabbix Proxy" | tee -a /etc/motd
-	fi
-	echo "###" | tee -a /etc/motd
-	echo "###########################################" | tee -a /etc/motd
+
+cat >> /etc/motd <<-"EOF"
+       __        ___  _ ______  _       ____         ___ _____
+       \ \      / (_)(_)__  (_)(_)_ __ |  _ \  ___  |_ _|_   _|
+        \ \ /\ / /| || | / /| || | '_ \| | | |/ _ \  | |  | |
+         \ V  V / | || |/ /_| || | | | | |_| |  __/_ | |  | |
+          \_/\_/  |_|/ /____|_|/ |_| |_|____/ \___(_)___| |_|
+                   |__/      |__/
+=======================================================================
+                            SECURITY NOTICE
+ ---------------------------------------------------------------------
+  This is a private secured computer system. It is for authorized use
+  only. Users (authorized or unauthorized) have no explicit or
+  implicit expectation of privacy. Any or all uses of this system and
+  all files on this system may be intercepted, monitored, recorded,
+  copied, audited, inspected, and disclosed to authorized site, law
+  enforcement personnel, as well as authorized officials of other
+  agencies, both domestic and foreign. By using this system, the user
+  consents to such interception, monitoring, recording, copying,
+  auditing, inspection, and disclosure at the discretion of
+  authorized site. All activity is logged with your host name and IP
+  address. Unauthorized or improper use of this system may result in
+  civil and criminal penalties. By continuing to use this system you
+  indicate your awareness of and consent to these terms and conditions
+  of use.
+ ---------------------------------------------------------------------
+ LOG OFF IMMEDIATELY,
+   if you do not agree to the conditions stated in this warning.
+=======================================================================
+EOF
 }
 
 function disableWrites {
+
+	if grep -iRlq "tmpfs /var/tmp tmpfs defaults,noatime,nosuid,size=500M 0 0" /etc/fstab; then
+		number=$(grep -iRn "tmpfs /var/tmp tmpfs defaults,noatime,nosuid,size=500M 0 0" /etc/fstab | cut -d: -f1)
+		sed -i "$number,\$d" /etc/fstab
+	fi
+
 	echo "tmpfs /var/tmp tmpfs defaults,noatime,nosuid,size=500M 0 0" | tee -a /etc/fstab
 	echo "tmpfs /var/log tmpfs defaults,noatime,nosuid,mode=0755,size=100m 0 0" |tee -a /etc/fstab
 	echo "tmpfs /tmp tmpfs defaults,noatime,nosuid,size=500m 0 0" | tee -a /etc/fstab
@@ -198,9 +225,9 @@ function smBusFix {
 }
 
 function installZabbixRepo {
-	wget https://repo.zabbix.com/zabbix/5.2/debian/pool/main/z/zabbix-release/zabbix-release_5.2-1+debian10_all.deb
-	dpkg -i zabbix-release_5.2-1+debian10_all.deb
-	apt update
+	wget https://repo.zabbix.com/zabbix/5.4/debian/pool/main/z/zabbix-release/zabbix-release_5.4-1+debian11_all.deb
+	dpkg -i zabbix-release_5.4-1+debian11_all.deb
+	DEBIAN_FRONTEND=noninteractive apt update
 }
 
 function installZabbixAgent {
