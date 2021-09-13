@@ -174,7 +174,7 @@ function changeMotd {
 	rm -r /etc/update-motd.d/10-uname
 	sed -i "s/#PrintLastLog yes/PrintLastLog no/g" /etc/ssh/sshd_config
 
-cat >> /etc/motd <<-"EOF"
+cat > /etc/motd <<-"EOF"
        __        ___  _ ______  _       ____         ___ _____
        \ \      / (_)(_)__  (_)(_)_ __ |  _ \  ___  |_ _|_   _|
         \ \ /\ / /| || | / /| || | '_ \| | | |/ _ \  | |  | |
