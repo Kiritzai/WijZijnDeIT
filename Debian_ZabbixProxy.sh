@@ -157,7 +157,21 @@ function changeSources {
 }
 
 function installUtilities {
-	apt install mlocate open-vm-tools sudo curl -yq
+
+	DEBIAN_FRONTEND=noninteractive \
+	apt-get install -yqq \
+	mlocate \
+	open-vm-tools \
+	sudo \
+	curl \
+	lftp \
+	snmp \
+	snmp-mibs-downloader \
+	nmap -yqq
+
+	sed -i "s/^\(mibs *:\).*/#\1/" /etc/snmp/snmp.conf
+	download-mibs
+	
 }
 
 function changeGrub {
