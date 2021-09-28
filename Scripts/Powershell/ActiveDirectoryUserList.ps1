@@ -1,10 +1,5 @@
 #Requires -RunAsAdministrator
 
-####
-## Title
-####
-(Get-Host).UI.RawUI.WindowTitle = ":: WijZijnDe.IT :: Power Menu :: V0.0.0.3 :: AD User List ::"
-
 Clear-Host
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
