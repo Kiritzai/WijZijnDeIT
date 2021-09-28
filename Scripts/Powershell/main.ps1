@@ -225,13 +225,13 @@ do
     switch ($mainMenu) {
         "General" { # General Menu
             $generalMenu = Get-MenuSelection -MenuItems "Return to Main Menu", `
-                                                    "Cleaning Windows Firewall Rules for RDS Servers", `
-                                                    "Search and Close selected files" `
+                                                        "Cleaning Windows Firewall Rules for RDS Servers", `
+                                                        "Search and Close selected files" `
                                                     -MenuPrompt "General"
 
             switch ($generalMenu) {
-                "1" { $script = "Scripts/Powershell/FirewallClean.ps1" }
-                "2" { $script = "Scripts/Powershell/SearchCloseFile.ps1" }
+                "Cleaning Windows Firewall Rules for RDS Servers"   { $script = "Scripts/Powershell/FirewallClean.ps1" }
+                "Search and Close selected files"                   { $script = "Scripts/Powershell/SearchCloseFile.ps1" }
             }
         }
         "Active Directory" { # Active Directory Menu
@@ -243,10 +243,10 @@ do
                                                     -MenuPrompt "Active Directory"
 
             switch ($adMenu) {
-                "1" { $script = "Scripts/Powershell/ActiveDirectoryTestCredentials.ps1" }
-                "2" { $script = "Scripts/Powershell/ActiveDirectoryUserList.ps1" }
-                "3" { $script = "Scripts/Powershell/ActiveDirectoryComputerList.ps1" }
-                "4" { $script = "Scripts/Powershell/ActiveDirectoryUsersinGroups.ps1" }
+                "Testing Credentials"                               { $script = "Scripts/Powershell/ActiveDirectoryTestCredentials.ps1" }
+                "Generating User List"                              { $script = "Scripts/Powershell/ActiveDirectoryUserList.ps1" }
+                "Generating Computer List"                          { $script = "Scripts/Powershell/ActiveDirectoryComputerList.ps1" }
+                "Users in Groups List"                              { $script = "Scripts/Powershell/ActiveDirectoryUsersinGroups.ps1" }
             }
         }
         "!! Danger !!" { # Danger Menu
@@ -255,7 +255,7 @@ do
                                                     -MenuPrompt "!! Danger !!"
 
             switch ($dangerMenu) {
-                "1" { $script = "Scripts/Powershell/DangerWipe.ps1" }
+                "Reset and Wipe Computer"                           { $script = "Scripts/Powershell/DangerWipe.ps1" }
             }
         }
         "Exit" { $mainMenu = 'q' }
@@ -277,7 +277,7 @@ do
     #    'c' { $script = "Scripts/Powershell/CreateShortcut.ps1" }
     #}
 
-    if (($mainMenu -ne 'q') -and (Get-Variable -Name script -ErrorAction SilentlyContinue)) {
+    if (($mainMenu -ne 'q') -and ($script -ne $null)) {
         [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::SecurityProtocol -bor 3072; &([scriptblock]::Create((Invoke-WebRequest -Headers @{"Cache-Control"="no-cache"} -DisableKeepAlive -useb "https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/$script")))
     }
 
