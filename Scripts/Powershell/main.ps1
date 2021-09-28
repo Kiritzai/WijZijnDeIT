@@ -209,6 +209,8 @@ $textMenu
 
 }
 
+Clear-Host
+
 do
 {
     (Get-Host).UI.RawUI.WindowTitle = ":: WijZijnDe.IT :: Power Menu :: $ncVer ::"
