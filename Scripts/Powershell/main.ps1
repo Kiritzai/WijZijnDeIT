@@ -226,7 +226,7 @@ do
         "General" { # General Menu
             $generalMenu = Get-MenuSelection -MenuItems "Return to Main Menu", `
                                                     "Cleaning Windows Firewall Rules for RDS Servers", `
-                                                    "Search and Close selected files",
+                                                    "Search and Close selected files" `
                                                     -MenuPrompt "General"
 
             switch ($generalMenu) {
@@ -251,7 +251,7 @@ do
         }
         "!! Danger !!" { # Danger Menu
             $dangerMenu = Get-MenuSelection -MenuItems "Return to Main Menu", `
-                                                    "Reset and Wipe Computer",
+                                                    "Reset and Wipe Computer" `
                                                     -MenuPrompt "!! Danger !!"
 
             switch ($dangerMenu) {
