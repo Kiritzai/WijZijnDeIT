@@ -20,7 +20,11 @@ foreach ($module in $modules) {
     }
 }
 
-$xlfile = "$env:TEMP\ComputersGeneratedList.xlsx"
+$foldername = Get-Random
+$folder = "$env:TEMP\$foldername\"
+New-Item -Path "$folder" -ItemType "directory" | Out-Null
+
+$xlfile = "$folder\ComputersGeneratedList.xlsx"
 Remove-Item $xlfile -ErrorAction SilentlyContinue
 
 # Get Computers
@@ -36,7 +40,7 @@ Press any key to continue
 "@
 
 # Opens the folder
-explorer "$env:TEMP"
+explorer "$folder"
 
 $result
 $UserInput = $Host.UI.ReadLine()
