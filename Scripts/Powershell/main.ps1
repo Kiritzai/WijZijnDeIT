@@ -209,11 +209,12 @@ $textMenu
 
 }
 
-Clear-Host
-
 do
 {
     (Get-Host).UI.RawUI.WindowTitle = ":: WijZijnDe.IT :: Power Menu :: $ncVer ::"
+
+    # Wiping everything clean :)
+    Clear-Host
 
     # Just making sure script variable is empty
     Clear-Variable script -ErrorAction SilentlyContinue
