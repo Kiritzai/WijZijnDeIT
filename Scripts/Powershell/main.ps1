@@ -59,6 +59,112 @@ if ((Get-CimInstance -ClassName CIM_OperatingSystem).Caption -match 'Windows Ser
 }
 
 
+<#
+    .SYNOPSIS
+        Displays a selection menu and returns the selected item
+    
+    .DESCRIPTION
+        Takes a list of menu items, displays the items and returns the user's selection.
+        Items can be selected using the up and down arrow and the enter key.
+    
+    .PARAMETER MenuItems
+        List of menu items to display
+    
+    .PARAMETER MenuPrompt
+        Menu prompt to display to the user.
+    
+    .EXAMPLE
+        PS C:\> Get-MenuSelection -MenuItems $value1 -MenuPrompt 'Value2'
+    
+    .NOTES
+        Additional information about the function.
+#>
+function Get-MenuSelection
+{
+    [CmdletBinding()]
+    [OutputType([string])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String[]]$MenuItems,
+        [Parameter(Mandatory = $true)]
+        [String]$MenuPrompt
+    )
+    # store initial cursor position
+    $cursorPosition = $host.UI.RawUI.CursorPosition
+    $pos = 0 # current item selection
+    
+    #==============
+    # 1. Draw menu
+    #==============
+    function Write-Menu
+    {
+        param (
+            [int]$selectedItemIndex
+        )
+        # reset the cursor position
+        $Host.UI.RawUI.CursorPosition = $cursorPosition
+        # Padding the menu prompt to center it
+        $prompt = $MenuPrompt
+        $maxLineLength = ($MenuItems | Measure-Object -Property Length -Maximum).Maximum + 4
+        #while ($prompt.Length -lt $maxLineLength+4)
+        #{
+            $count = "== $prompt - v$($ncVer) ==========================="
+            $total = ""
+            for ($i = 0; $i -lt ($count | Measure-Object -Character).Characters; $i++) {
+                $total += "="
+            }
+            $prompt = "`n $total`n $count`n $total`n"
+        #}
+        Write-Host $prompt -ForegroundColor Green
+        # Write the menu lines
+        for ($i = 0; $i -lt $MenuItems.Count; $i++)
+        {
+            $line = "    $($MenuItems[$i])" + (" " * ($maxLineLength - $MenuItems[$i].Length))
+            if ($selectedItemIndex -eq $i)
+            {
+                Write-Host $line -ForegroundColor Blue -BackgroundColor Gray
+            }
+            else
+            {
+                Write-Host $line
+            }
+        }
+    }
+    
+    Write-Menu -selectedItemIndex $pos
+    $key = $null
+    while ($key -ne 13)
+    {
+        #============================
+        # 2. Read the keyboard input
+        #============================
+        $press = $host.ui.rawui.readkey("NoEcho,IncludeKeyDown")
+        $key = $press.virtualkeycode
+        if ($key -eq 38)
+        {
+            $pos--
+        }
+        if ($key -eq 40)
+        {
+            $pos++
+        }
+        #handle out of bound selection cases
+        if ($pos -lt 0) { $pos = 0 }
+        if ($pos -eq $MenuItems.count) { $pos = $MenuItems.count - 1 }
+        
+        #==============
+        # 1. Draw menu
+        #==============
+        Write-Menu -selectedItemIndex $pos
+    }
+
+    Clear-Host
+    return $MenuItems[$pos]
+    #return $pos
+}
+
 
 function Show-Menu
 {
@@ -107,28 +213,69 @@ do
 {
     (Get-Host).UI.RawUI.WindowTitle = ":: WijZijnDe.IT :: Power Menu :: $ncVer ::"
 
+    # Just making sure script variable is empty
     Clear-Variable script -ErrorAction SilentlyContinue
 
-    Show-Menu
-    $selection = Read-Host "Please make a selection"
-    switch ($selection)
-    {
-        'G1' { $script = "Scripts/Powershell/FirewallClean.ps1" }
-        'G2' { $script = "Scripts/Powershell/SearchCloseFile.ps1" }
-        'A1' { $script = "Scripts/Powershell/ActiveDirectoryTestCredentials.ps1" }
-        'A2' { $script = "Scripts/Powershell/ActiveDirectoryUserList.ps1" }
-        'A3' { $script = "Scripts/Powershell/ActiveDirectoryComputerList.ps1" }
-        'A4' { $script = "Scripts/Powershell/ActiveDirectoryUsersinGroups.ps1" }
-        'S1' { $script = "Scripts/Powershell/SoftwareMicrosoftEdge.ps1" }
-        'S2' { $script = "Scripts/Powershell/SoftwareOneDrive.ps1" }
-        'T1' { $script = "Scripts/Powershell/TpmGetVersion.ps1" }
-        'T2' { $script = "Scripts/Powershell/TpmReset.ps1" }
-        'M1' { $script = "Scripts/Powershell/IntuneGenerateHWID.ps1" }
-        'c' { $script = "Scripts/Powershell/CreateShortcut.ps1" }
+    $mainMenu = Get-MenuSelection -MenuItems "General", "Active Directory", "!! Danger !!", "Exit" -MenuPrompt "Main Menu"
+    
+    # Main Menu
+    switch ($mainMenu) {
+        "General" { # General Menu
+            $generalMenu = Get-MenuSelection -MenuItems "Return to Main Menu", `
+                                                    "Cleaning Windows Firewall Rules for RDS Servers", `
+                                                    "Search and Close selected files",
+                                                    -MenuPrompt "General"
+
+            switch ($generalMenu) {
+                "1" { $script = "Scripts/Powershell/FirewallClean.ps1" }
+                "2" { $script = "Scripts/Powershell/SearchCloseFile.ps1" }
+            }
+        }
+        "Active Directory" { # Active Directory Menu
+            $adMenu = Get-MenuSelection -MenuItems "Return to Main Menu", `
+                                                    "Testing Credentials", `
+                                                    "Generating User List", `
+                                                    "Generating Computer List", `
+                                                    "Users in Groups List" `
+                                                    -MenuPrompt "Active Directory"
+
+            switch ($adMenu) {
+                "1" { $script = "Scripts/Powershell/ActiveDirectoryTestCredentials.ps1" }
+                "2" { $script = "Scripts/Powershell/ActiveDirectoryUserList.ps1" }
+                "3" { $script = "Scripts/Powershell/ActiveDirectoryComputerList.ps1" }
+                "4" { $script = "Scripts/Powershell/ActiveDirectoryUsersinGroups.ps1" }
+            }
+        }
+        "!! Danger !!" { # Danger Menu
+            $dangerMenu = Get-MenuSelection -MenuItems "Return to Main Menu", `
+                                                    "Reset and Wipe Computer",
+                                                    -MenuPrompt "!! Danger !!"
+
+            switch ($dangerMenu) {
+                "1" { $script = "Scripts/Powershell/DangerWipe.ps1" }
+            }
+        }
+        "Exit" { $mainMenu = 'q' }
     }
 
-    if ($selection -ne 'q') {
+    #switch ($selection)
+    #{
+    #    'G1' { $script = "Scripts/Powershell/FirewallClean.ps1" }
+    #    'G2' { $script = "Scripts/Powershell/SearchCloseFile.ps1" }
+    #    'A1' { $script = "Scripts/Powershell/ActiveDirectoryTestCredentials.ps1" }
+    #    'A2' { $script = "Scripts/Powershell/ActiveDirectoryUserList.ps1" }
+    #    'A3' { $script = "Scripts/Powershell/ActiveDirectoryComputerList.ps1" }
+    #    'A4' { $script = "Scripts/Powershell/ActiveDirectoryUsersinGroups.ps1" }
+    #    'S1' { $script = "Scripts/Powershell/SoftwareMicrosoftEdge.ps1" }
+    #    'S2' { $script = "Scripts/Powershell/SoftwareOneDrive.ps1" }
+    #    'T1' { $script = "Scripts/Powershell/TpmGetVersion.ps1" }
+    #    'T2' { $script = "Scripts/Powershell/TpmReset.ps1" }
+    #    'M1' { $script = "Scripts/Powershell/IntuneGenerateHWID.ps1" }
+    #    'c' { $script = "Scripts/Powershell/CreateShortcut.ps1" }
+    #}
+
+    if (($mainMenu -ne 'q') -and (Get-Variable -Name script -ErrorAction SilentlyContinue)) {
         [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::SecurityProtocol -bor 3072; &([scriptblock]::Create((Invoke-WebRequest -Headers @{"Cache-Control"="no-cache"} -DisableKeepAlive -useb "https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/$script")))
     }
 
-} until ($selection -eq 'q')
+} until ($mainMenu -eq 'q')
