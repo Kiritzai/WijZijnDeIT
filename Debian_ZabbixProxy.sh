@@ -169,7 +169,7 @@ function installUtilities {
 	snmp-mibs-downloader \
 	nmap -yqq
 
-	sed -i "s/^\(mibs *:\).*/#\1/" /etc/snmp/snmp.conf
+	sed -i "s/#mibs :/mibs :/" /etc/snmp/snmp.conf
 	download-mibs
 	
 }
