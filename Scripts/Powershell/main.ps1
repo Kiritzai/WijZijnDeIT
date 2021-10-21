@@ -219,7 +219,7 @@ do
     # Just making sure script variable is empty
     Clear-Variable script -ErrorAction SilentlyContinue
 
-    $mainMenu = Get-MenuSelection -MenuItems "General", "Active Directory", "!! Danger !!", "Exit" -MenuPrompt "Main Menu"
+    $mainMenu = Get-MenuSelection -MenuItems "General", "Active Directory", "Software", "!! Danger !!", "Exit" -MenuPrompt "Main Menu"
     
     # Main Menu
     switch ($mainMenu) {
@@ -247,6 +247,17 @@ do
                 "Generating User List"                              { $script = "Scripts/Powershell/ActiveDirectoryUserList.ps1" }
                 "Generating Computer List"                          { $script = "Scripts/Powershell/ActiveDirectoryComputerList.ps1" }
                 "Users in Groups List"                              { $script = "Scripts/Powershell/ActiveDirectoryUsersinGroups.ps1" }
+            }
+        }
+        "Software" { # Software Menu
+            $softwareMenu = Get-MenuSelection -MenuItems "Return to Main Menu", `
+                                                    "Installing Microsoft Edge", `
+                                                    "Installing Microsoft OneDrive" `
+                                                    -MenuPrompt "Software"
+
+            switch ($softwareMenu) {
+                "Installing Microsoft Edge"                               { $script = "Scripts/Powershell/SoftwareMicrosoftEdge.ps1" }
+                "Installing Microsoft OneDrive"                           { $script = "Scripts/Powershell/SoftwareOneDrive.ps1" }
             }
         }
         "!! Danger !!" { # Danger Menu

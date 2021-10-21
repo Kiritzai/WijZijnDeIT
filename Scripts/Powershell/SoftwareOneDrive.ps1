@@ -5,7 +5,8 @@ Clear-Host
 Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Name "DisableFirstRunCustomize" -Value 2
 
 #OPTIONAL CONFIGURATION:
-$xmlDownloadURL = "https://g.live.com/1rewlive5skydrive/ODSUInsider"
+#$xmlDownloadURL = "https://g.live.com/1rewlive5skydrive/ODSUInsider"
+$xmlDownloadURL = "https://g.live.com/1rewlive5skydrive/ODSUProduction64"
 $temporaryInstallerPath = Join-Path $Env:TEMP -ChildPath "OnedriveInstaller.EXE"
 $regPath = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\OneDrive"
 
