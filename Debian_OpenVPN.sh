@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Actual Command to Run
-# bash <(wget -O - https://github.com/Kiritzai/WijZijnDeIT/raw/master/Debian_OpenVPN.sh)
+# bash <(wget --no-cache -O - https://github.com/Kiritzai/WijZijnDeIT/raw/master/Debian_OpenVPN.sh)
 # curl -sSL https://github.com/Kiritzai/WijZijnDeIT/raw/master/Debian_OpenVPN.sh | bash
 
 
@@ -49,7 +49,7 @@ cat <<EOF
 	Example: 10.200.0.0
  
 EOF
-read -p "Scope: " input_ipaddress < /dev/tty
+read -p $'\tScope: ' input_dhcp_scope < /dev/tty
 
 
 # DNS Server
@@ -60,7 +60,7 @@ cat <<EOF
 	Enter IP Address for local DNS server
  
 EOF
-read input_dns_server < /dev/tty
+read -p $'\tDNS: ' input_dns_server < /dev/tty
 
 
 # Domain Name
@@ -73,7 +73,7 @@ cat <<EOF
 	Example: domain.lan
  
 EOF
-read input_domain_name < /dev/tty
+read -p $'\tDomain: ' input_domain_name < /dev/tty
 
 
 # Route
@@ -86,11 +86,24 @@ cat <<EOF
 	Example 10.10.10.0 255.255.255.0
  
 EOF
-read input_ip_route < /dev/tty
+read -p $'\tRoute: ' input_ip_route < /dev/tty
 
 
+# Route
+clear
+echo "$BANNER"
+cat <<EOF
 
-read -p "Continue? (Y/N): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
+	DHCP Scope: ${input_dhcp_scope}
+	DNS Server: ${input_dns_server}
+	Domain Name: ${input_domain_name}
+	IP Route: ${input_ip_route}
+
+	Are these your settings?
+ 
+EOF
+
+read -p $'Continue? (Y/N): ' confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
 
 exit
 
@@ -320,7 +333,7 @@ dh dh.pem
 auth SHA512
 tls-crypt tc.key
 topology subnet
-server $input_ipaddress 255.255.255.0
+server $input_dhcp_scope 255.255.255.0
 ifconfig-pool-persist ipp.txt
 push \"dhcp-option DOMAIN $input_domain_name\"
 push \"dhcp-option DNS $input_dns_server\"
@@ -344,13 +357,13 @@ duplicate-cn" | tee /etc/openvpn/server/server.conf
 Before=network.target
 [Service]
 Type=oneshot
-ExecStart=/sbin/iptables -t nat -A POSTROUTING -s $input_ipaddress/24 ! -d $input_ipaddress/24 -j SNAT --to $ip
+ExecStart=/sbin/iptables -t nat -A POSTROUTING -s $input_dhcp_scope/24 ! -d $input_dhcp_scope/24 -j SNAT --to $ip
 ExecStart=/sbin/iptables -I INPUT -p udp --dport 1194 -j ACCEPT
-ExecStart=/sbin/iptables -I FORWARD -s $input_ipaddress/24 -j ACCEPT
+ExecStart=/sbin/iptables -I FORWARD -s $input_dhcp_scope/24 -j ACCEPT
 ExecStart=/sbin/iptables -I FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
-ExecStop=/sbin/iptables -t nat -D POSTROUTING -s $input_ipaddress/24 ! -d $input_ipaddress/24 -j SNAT --to $ip
+ExecStop=/sbin/iptables -t nat -D POSTROUTING -s $input_dhcp_scope/24 ! -d $input_dhcp_scope/24 -j SNAT --to $ip
 ExecStop=/sbin/iptables -D INPUT -p udp --dport 1194 -j ACCEPT
-ExecStop=/sbin/iptables -D FORWARD -s $input_ipaddress/24 -j ACCEPT
+ExecStop=/sbin/iptables -D FORWARD -s $input_dhcp_scope/24 -j ACCEPT
 ExecStop=/sbin/iptables -D FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
 RemainAfterExit=yes
 [Install]
