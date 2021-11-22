@@ -103,7 +103,9 @@ cat <<EOF
  
 EOF
 
-read -p $'\tContinue? (Y/N): ' confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
+read -p $'\tContinue? (Y/N): ' confirm && [[ $confirm == [yY] ]] || exit 1
+
+echo 'CONTINUE'
 
 exit
 
