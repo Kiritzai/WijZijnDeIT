@@ -35,7 +35,7 @@ BANNER=$(cat <<EOF
 EOF
 )
 echo "$BANNER"
-read -n 1 -r -s -p $'Press enter to continue...\n'
+read -s -p $'\tPress enter to continue...\n' -n 1 -r
 
 
 # DHCP Scope
