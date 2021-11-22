@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Actual Command to Run
-# bash <(wget -O - https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/main/Debian_OpenVPN.sh)
-# curl -sSL https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/main/Debian_OpenVPN.sh | bash
+# bash <(wget -O - https://github.com/Kiritzai/WijZijnDeIT/raw/master/Debian_OpenVPN.sh)
+# curl -sSL https://github.com/Kiritzai/WijZijnDeIT/raw/master/Debian_OpenVPN.sh | bash
 
 
 ################
@@ -49,7 +49,7 @@ cat <<EOF
 	Example: 10.200.0.0
  
 EOF
-read input_ipaddress < /dev/tty
+read -p "Scope: " input_ipaddress < /dev/tty
 
 
 # DNS Server
@@ -88,6 +88,9 @@ cat <<EOF
 EOF
 read input_ip_route < /dev/tty
 
+
+
+read -p "Continue? (Y/N): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
 
 exit
 
