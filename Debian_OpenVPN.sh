@@ -137,9 +137,9 @@ function installVPN {
 	softether-vpnserver \
 	dnsmasq -yqq
 
-	echo "interface=tap_soft" | tee -a /etc/dnsmasq.conf
-	echo "dhcp-range=tap_soft,${input_dhcp_scope},12h" | tee -a /etc/dnsmasq.conf
-	echo "dhcp-option=tap_soft,3,${input_gateway}" | tee -a /etc/dnsmasq.conf
+	#echo "interface=tap_soft" | tee -a /etc/dnsmasq.conf
+	#echo "dhcp-range=tap_soft,${input_dhcp_scope},12h" | tee -a /etc/dnsmasq.conf
+	#echo "dhcp-option=tap_soft,3,${input_gateway}" | tee -a /etc/dnsmasq.conf
 
 	echo 'net.ipv4.ip_forward=1' | tee /etc/sysctl.d/ipv4_forwarding.conf
 	sysctl --system
