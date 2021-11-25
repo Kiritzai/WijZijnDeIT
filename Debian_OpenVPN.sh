@@ -98,7 +98,11 @@ cat <<EOF
 
 	Enter IP route
 	
-	Example 10.10.10.0 255.255.255.0
+	Example: [iprange/subnet,gateway]
+	Example: 10.10.0.0/16,10.10.10.1
+
+	For multiple routs
+	Example: 10.10.0.0/16,10.10.10.1,192.168.30.0/24,10.10.10.1
  
 EOF
 read -p $'\tRoute: ' input_ip_route < /dev/tty
@@ -145,12 +149,9 @@ function installVPN {
 	sysctl --system
 
 	# Backup /etc/dnsmasq.conf
-	mv /etc/dnsmasq.conf /etc/dnsmasq.conf.backup
+	mv /etc/dnsmasq.conf /etc/dnsmasq.conf-backup
 
-	
-
-echo -e "
-##################################################################################
+echo -e "##################################################################################
 # SoftEther VPN server dnsmasq.conf
 ################################################################################## Interface Settings
 
@@ -176,7 +177,7 @@ dhcp-range=${input_dhcp_scope},12h
 
 # Override the default route supplied by dnsmasq, which assumes the
 # router is the same machine as the one running dnsmasq.
-dhcp-option=3,${input_gateway}
+dhcp-option=3
 
 # If you don't want dnsmasq to poll /etc/resolv.conf or other resolv
 # files for changes and re-read them then uncomment this.
@@ -194,14 +195,23 @@ no-resolv
 # problems in such a case.
 dhcp-no-override
 
+# The following directives prevent dnsmasq from forwarding plain names (without any dots)
+# or addresses in the non-routed address space to the parent nameservers.
+domain-needed
+
 # Never forward addresses in the non-routed address spaces.
 bogus-priv
+
+# Send microsoft-specific option to tell windows to release the DHCP lease
+# when it shuts down. Note the "i" flag, to tell dnsmasq to send the
+# value as a four-byte integer - that's what microsoft wants. See
+dhcp-option=vendor:MSFT,2,1i
 
 ################################################################################## External DNS Servers
 
 # Use this DNS servers for incoming DNS requests = Cloudflare
-server=8.8.8.8
-server=8.8.4.4
+#server=8.8.8.8
+#server=8.8.4.4
 
 #########################################
 
@@ -213,109 +223,70 @@ server=8.8.4.4
 # Set IPv4 DNS server for client machines
 dhcp-option=option:dns-server,${input_dns_server}
 
+#########################################
+
+################################################################################## Routing
+
+# Let's send these DNS Servers to clients.
+# The first IP is the IPv4 address that are already assigned to the tap_soft
+
+# Set IPv4 DNS server for client machines
+dhcp-option=option:classless-static-route,${input_ip_route}
+
 #########################################" | tee /etc/dnsmasq.conf
 
 
-echo -e "
-#!/bin/sh
-### BEGIN INIT INFO
-# Provides:          vpnserver
-# Required-Start:    \$network \$remote_fs
-# Required-Stop:     \$network \$remote_fs
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
-# Short-Description: SoftEther VPN Server
-### END INIT INFO
+	# Backup /etc/dnsmasq.conf
+	mv /lib/systemd/system/softether-vpnserver.service /lib/systemd/system/softether-vpnserver.service-backup
 
-DAEMON=/usr/local/vpnserver/vpnserver
-LOCK=/var/lock/subsys/vpnserver
-TAP_ADDR=${input_gateway}
-TAP_INTERFACE=tap_soft
+echo -e "[Unit]
+Description=SoftEther VPN Server
+After=network-online.target auditd.service
+Wants=network-online.target
 
-test -x \$DAEMON || exit 0
-case "\$1" in
-start)
-\$DAEMON start
-touch \$LOCK
-sleep 3
-#####################################################
-#       ifconfig tap interface                      
-#####################################################
-#
-# Assign \$TAP_ADDR to our tap interface
-/sbin/ifconfig \$TAP_INTERFACE \$TAP_ADDR
-#
-#####################################################
-#       End                                         
-#####################################################
-sleep 3
-service dnsmasq start
-;;
-stop)
-\$DAEMON stop
-rm \$LOCK
-;;
-restart)
-\$DAEMON stop
-sleep 3
-\$DAEMON start
-sleep 3
-######################################################
-#       ifconfig tap interface                       
-######################################################
-#
-# Assign \$TAP_ADDR to our tap interface
-/sbin/ifconfig \$TAP_INTERFACE \$TAP_ADDR
-#
-######################################################
-#       End                                          
-######################################################
-sleep 3
-service dnsmasq restart
-;;
-*)
-echo \"Usage: \$0 {start|stop|restart}\"
-exit 1
-esac
-exit 0" | tee /etc/init.d/vpnserver
+[Service]
+Type=forking
+TasksMax=629145
+EnvironmentFile=-/etc/defaults/softether-vpnserver
+ExecStart=/usr/libexec/softether/vpnserver/vpnserver start
+ExecStop=/usr/libexec/softether/vpnserver/vpnserver stop
+ExecStartPost=sleep 3
+ExecStartPost=/usr/sbin/ifconfig tap_soft ${$input_gateway}
+KillMode=mixed
+RestartSec=5s
+Restart=on-failure
 
-	chmod +x /etc/init.d/vpnserver
+# Hardening
+PrivateTmp=yes
+ProtectHome=yes
+ProtectSystem=strict
+RuntimeDirectory=softether
+StateDirectory=softether
+LogsDirectory=softether
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE CAP_NET_BROADCAST CAP_NET_RAW CAP_SYS_NICE CAP_SYSLOG CAP_SETUID
 
+[Install]
+WantedBy=multi-user.target" | tee /lib/systemd/system/softether-vpnserver.service
+
+
+
+
+	# Depends on SoftEther vpnserver
+	sed -i "s/After=network.target/After=softether-vpnserver.service network.target/g" /lib/systemd/system/dnsmasq.service
+
+	# Let tap_soft interface be created before starting
+	sed -i '/Test the config file and refuse starting if it is not valid/a ExecStartPre=/\bin/\sleep 3' /lib/systemd/system/dnsmasq.service
+
+	# Grab local IP Address
 	local_ip=$(ip addr | grep inet | grep -v inet6 | grep -vE '127\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | cut -d '/' -f 1 | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}')
+
+	# Create from gateway an network address
 	network=$(IFS=.; set -o noglob; set -- $input_gateway; printf '%s\n' "$1.$2.$3.0")
 
+	# make iptables
     iptables -t nat -A POSTROUTING -s $network/24 -j SNAT --to-source $local_ip
-
-	/etc/init.d/vpnserver restart
-	/etc/init.d/dnsmasq restart
-
-
-#echo "[Unit]
-#Before=network.target
-#[Service]
-#Type=oneshot
-#ExecStart=/sbin/iptables -t nat -A POSTROUTING -s $input_dhcp_scope/24 ! -d $input_dhcp_scope/24 -j SNAT --to $ip
-#ExecStart=/sbin/iptables -I INPUT -p udp --dport 1194 -j ACCEPT
-#ExecStart=/sbin/iptables -I FORWARD -s $input_dhcp_scope/24 -j ACCEPT
-#ExecStart=/sbin/iptables -I FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
-#ExecStop=/sbin/iptables -t nat -D POSTROUTING -s $input_dhcp_scope/24 ! -d $input_dhcp_scope/24 -j SNAT --to $ip
-#ExecStop=/sbin/iptables -D INPUT -p udp --dport 1194 -j ACCEPT
-#ExecStop=/sbin/iptables -D FORWARD -s $input_dhcp_scope/24 -j ACCEPT
-#ExecStop=/sbin/iptables -D FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
-#RemainAfterExit=yes
-#[Install]
-#WantedBy=multi-user.target" | tee /etc/systemd/system/openvpn-iptables.service
-
-
-	# Import the public GPG key
-	#wget -O - https://swupdate.openvpn.net/repos/repo-public.gpg|apt-key add -
-
-	# Create OpenVPN repo list
-	#echo "deb http://build.openvpn.net/debian/openvpn/stable bullseye main" > /etc/apt/sources.list.d/openvpn-aptrepo.list
-
-	
 
 }
 
 main
-#reboot
+reboot
