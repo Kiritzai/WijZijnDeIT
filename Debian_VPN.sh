@@ -3,8 +3,8 @@
 set +H
 
 # Actual Command to Run
-# bash <(wget --no-cache -O - https://github.com/Kiritzai/WijZijnDeIT/raw/master/Debian_OpenVPN.sh)
-# curl -sSL https://github.com/Kiritzai/WijZijnDeIT/raw/master/Debian_OpenVPN.sh | bash
+# bash <(wget --no-cache -O - https://github.com/Kiritzai/WijZijnDeIT/raw/master/Debian_VPN.sh)
+# curl -sSL https://github.com/Kiritzai/WijZijnDeIT/raw/master/Debian_VPN.sh | bash
 
 
 ################
@@ -12,7 +12,7 @@ set +H
 ################
 
 # Software
-SOFTWARE="OpenVPN"
+SOFTWARE="VPN"
 
 
 ##################
@@ -197,7 +197,7 @@ dhcp-no-override
 
 # The following directives prevent dnsmasq from forwarding plain names (without any dots)
 # or addresses in the non-routed address space to the parent nameservers.
-domain-needed
+#domain-needed
 
 # Never forward addresses in the non-routed address spaces.
 bogus-priv
@@ -210,8 +210,12 @@ dhcp-option=vendor:MSFT,2,1i
 ################################################################################## External DNS Servers
 
 # Use this DNS servers for incoming DNS requests = Cloudflare
-#server=8.8.8.8
-#server=8.8.4.4
+server=/bratzler.lan/172.16.50.11
+server=/bratzler.lan/172.16.50.12
+#server=/16.172.in-addr.arpa/172.16.50.11
+#server=/16.172.in-addr.arpa/172.16.50.12
+server=8.8.8.8
+server=8.8.4.4
 
 #########################################
 
@@ -283,8 +287,11 @@ WantedBy=multi-user.target" | tee /lib/systemd/system/softether-vpnserver.servic
 	# Create from gateway an network address
 	network=$(IFS=.; set -o noglob; set -- $input_gateway; printf '%s\n' "$1.$2.$3.0")
 
-	# make iptables
+	# make iptables ( To list rules : iptables -t nat -L -n -v )
     iptables -t nat -A POSTROUTING -s $network/24 -j SNAT --to-source $local_ip
+	iptables -I INPUT -p udp --dport 5555 -j ACCEPT
+	iptables -I FORWARD -s $network/24 -j ACCEPT
+	iptables -I FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
 
 }
 
