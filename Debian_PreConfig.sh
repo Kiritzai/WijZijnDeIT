@@ -1,9 +1,10 @@
 #!/bin/bash
 
-# curl -sSL http://10.30.36.3/Debian_ZabbixProxy.sh | bash
-# curl -sSL https://raw.githubusercontent.com/Kiritzai/WijZijnDeIT/master/Debian_ZabbixProxy.sh | bash
-# curl -sSL http://install.wijzijnde.it | bash
-# bash <(wget -O - http://install.wijzijnde.it)
+set +H
+
+# Actual Command to Run
+# bash <(wget --no-cache -O - https://github.com/Kiritzai/WijZijnDeIT/raw/master/Debian_PreConfig.sh)
+# curl -sSL https://github.com/Kiritzai/WijZijnDeIT/raw/master/Debian_PreConfig.sh | bash
 
 ############################
 #
