@@ -39,11 +39,6 @@ EOF
 echo "$BANNER"
 read -s -p $'\tPress enter to continue...\n' -n 1 -r
 
-# Summary
-clear
-echo "$BANNER"
-read -p $'\tInstall? (Y/N): ' confirm && [[ $confirm == [yY] ]] || exit 1
-
 main () {
 	installZabbixAgent
 }
