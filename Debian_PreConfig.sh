@@ -6,6 +6,15 @@ set +H
 # bash <(wget --no-cache -O - https://github.com/Kiritzai/WijZijnDeIT/raw/master/Debian_PreConfig.sh)
 # curl -sSL https://github.com/Kiritzai/WijZijnDeIT/raw/master/Debian_PreConfig.sh | bash
 
+
+################
+## Parameters ##
+################
+
+# Software
+SOFTWARE="PreConfig"
+
+
 ############################
 #
 ## Installation
@@ -17,6 +26,20 @@ if [[ "$EUID" -ne 0 ]]; then
 	echo "Sorry, you need to run this as root"
 	exit
 fi
+
+BANNER=$(cat <<EOF
+	__        ___  _ ______  _       ____         ___ _____
+	\ \      / (_)(_)__  (_)(_)_ __ |  _ \  ___  |_ _|_   _|
+	 \ \ /\ / /| || | / /| || | '_ \| | | |/ _ \  | |  | |
+	  \ V  V / | || |/ /_| || | | | | |_| |  __/_ | |  | |
+	   \_/\_/  |_|/ /____|_|/ |_| |_|____/ \___(_)___| |_|
+	            |__/      |__/    ${SOFTWARE} Installation
+ 
+ 
+EOF
+)
+echo "$BANNER"
+read -s -p $'\tPress enter to continue...\n' -n 1 -r
 
 ############################
 #
