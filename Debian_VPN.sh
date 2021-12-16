@@ -202,18 +202,24 @@ dhcp-no-override
 # Never forward addresses in the non-routed address spaces.
 bogus-priv
 
-# Send microsoft-specific option to tell windows to release the DHCP lease
-# when it shuts down. Note the "i" flag, to tell dnsmasq to send the
-# value as a four-byte integer - that's what microsoft wants. See
-dhcp-option=vendor:MSFT,2,1i
+# Domain
+domain=${input_domain_name}
+
+ Set the DHCP server to authoritative mode. In this mode it will barge in
+# and take over the lease for any client which broadcasts on the network,
+# whether it has a record of the lease or not. This avoids long timeouts
+# when a machine wakes up on a new network. DO NOT enable this if there's
+# the slighest chance that you might end up accidentally configuring a DHCP
+# server for your campus/company accidentally. The ISC server uses
+# the same option, and this URL provides more information:
+# http://www.isc.org/index.pl?/sw/dhcp/authoritative.php
+dhcp-authoritative
 
 ################################################################################## External DNS Servers
 
-# Use this DNS servers for incoming DNS requests = Cloudflare
-server=/bratzler.lan/172.16.50.11
-server=/bratzler.lan/172.16.50.12
-#server=/16.172.in-addr.arpa/172.16.50.11
-#server=/16.172.in-addr.arpa/172.16.50.12
+# Use this DNS servers for incoming DNS requests
+server=/${input_domain_name}/172.16.50.11
+server=/${input_domain_name}/172.16.50.12
 server=8.8.8.8
 server=8.8.4.4
 
@@ -271,9 +277,6 @@ CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE CAP_NET_BROADCAST CAP_N
 
 [Install]
 WantedBy=multi-user.target" | tee /lib/systemd/system/softether-vpnserver.service
-
-
-
 
 	# Depends on SoftEther vpnserver
 	sed -i "s/After=network.target/After=softether-vpnserver.service network.target/g" /lib/systemd/system/dnsmasq.service
