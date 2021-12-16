@@ -56,11 +56,11 @@ function installZabbixAgent {
 	dpkg -i zabbix-release_5.4-1+debian11_all.deb
 
 	# Updating repository
-	DEBIAN_FRONTEND=noninteractive apt update
+	DEBIAN_FRONTEND=noninteractive apt -yqq update
 
 	DEBIAN_FRONTEND=noninteractive \
-	apt-get install \
-	zabbix-agent -yqq
+	apt -yqq install \
+	zabbix-agent
 
 	rm /etc/zabbix/zabbix_agentd.conf
 
