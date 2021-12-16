@@ -60,13 +60,34 @@ function message {
 
 
 main () {
+	clear
+	echo "$BANNER"
 	changeSources
+
+	clear
+	echo "$BANNER"
 	installUtilities
+	
+	clear
+	echo "$BANNER"
 	setSudo
+
+	clear
+	echo "$BANNER"
 	changeGrub
+
+	clear
+	echo "$BANNER"
     disableWrites
+
+	clear
+	echo "$BANNER"
     smBusFix
+
+	clear
+	echo "$BANNER"
 	changeMotd
+
 	exit
 }
 
@@ -74,7 +95,7 @@ function changeSources {
 
 	message "Adjusting sources"
 
-	DEBIAN_FRONTEND=noninteractive apt clean
+	DEBIAN_FRONTEND=noninteractive apt -yqq clean
 	rm /etc/apt/sources.list
 	echo "deb http://ftp.debian.org/debian/ stable contrib main non-free" | tee /etc/apt/sources.list
 	echo "deb-src http://ftp.debian.org/debian/ stable contrib main non-free" | tee -a /etc/apt/sources.list
@@ -83,11 +104,11 @@ function changeSources {
 	echo "deb http://ftp.debian.org/debian/ stable-updates contrib main non-free" | tee -a /etc/apt/sources.list
 	echo "deb-src http://ftp.debian.org/debian/ stable-updates contrib main non-free" | tee -a /etc/apt/sources.list
 	#echo "deb http://deb.debian.org/debian stable-backports main" > /etc/apt/sources.list.d/backports.list
-	DEBIAN_FRONTEND=noninteractive apt update
-	DEBIAN_FRONTEND=noninteractive apt install --reinstall dpkg libc-bin -yqq
-	DEBIAN_FRONTEND=noninteractive apt update
-	DEBIAN_FRONTEND=noninteractive apt upgrade -yqq
-	DEBIAN_FRONTEND=noninteractive apt autoremove -yqq
+	DEBIAN_FRONTEND=noninteractive apt -yqq update
+	#DEBIAN_FRONTEND=noninteractive apt -yqq install --reinstall dpkg libc-bin 
+	DEBIAN_FRONTEND=noninteractive apt -yqq update
+	DEBIAN_FRONTEND=noninteractive apt -yqq upgrade
+	DEBIAN_FRONTEND=noninteractive apt -yqq autoremove
 }
 
 function installUtilities {
@@ -95,12 +116,12 @@ function installUtilities {
     message "Installing packages... this can take a while!"
 
 	DEBIAN_FRONTEND=noninteractive \
-	apt-get install -yqq \
+	apt-get -yqq install  \
 	mlocate \
 	open-vm-tools \
 	sudo \
 	curl \
-    git -yqq
+    git
 	
     # Update Locate datebase after installation
 	updatedb
