@@ -218,8 +218,7 @@ dhcp-authoritative
 ################################################################################## External DNS Servers
 
 # Use this DNS servers for incoming DNS requests
-server=/${input_domain_name}/172.16.50.11
-server=/${input_domain_name}/172.16.50.12
+server=/${input_domain_name}/${input_dns_server}
 server=8.8.8.8
 server=8.8.4.4
 
