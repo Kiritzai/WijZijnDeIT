@@ -133,13 +133,13 @@ main () {
 function installVPN {
 
 	# Updating repository
-	DEBIAN_FRONTEND=noninteractive apt update
+	DEBIAN_FRONTEND=noninteractive apt -yqq update
 
 	DEBIAN_FRONTEND=noninteractive \
-	apt-get install \
+	apt-get -yqq install \
 	iptables-persistent \
 	softether-vpnserver \
-	dnsmasq -yqq
+	dnsmasq
 
 	#echo "interface=tap_soft" | tee -a /etc/dnsmasq.conf
 	#echo "dhcp-range=tap_soft,${input_dhcp_scope},12h" | tee -a /etc/dnsmasq.conf
