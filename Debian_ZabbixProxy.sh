@@ -3,8 +3,8 @@
 set +H
 
 # Actual Command to Run
-# bash <(wget --no-cache -O - https://github.com/Kiritzai/WijZijnDeIT/raw/master/Debian_ZabbixAgent.sh)
-# curl -sSL https://github.com/Kiritzai/WijZijnDeIT/raw/master/Debian_ZabbixAgent.sh | bash
+# bash <(wget --no-cache -O - https://github.com/Kiritzai/WijZijnDeIT/raw/master/Debian_ZabbixProxy.sh)
+# curl -sSL https://github.com/Kiritzai/WijZijnDeIT/raw/master/Debian_ZabbixProxy.sh | bash
 
 
 ################
@@ -12,7 +12,7 @@ set +H
 ################
 
 # Software
-SOFTWARE="Zabbix Agent"
+SOFTWARE="Zabbix Proxy"
 
 
 ##################
@@ -44,7 +44,7 @@ main () {
 }
 
 
-function installZabbixAgent {
+function installZabbixProxy {
 
 	# Installing Zabbix Repo
 	wget https://repo.zabbix.com/zabbix/5.4/debian/pool/main/z/zabbix-release/zabbix-release_5.4-1+debian11_all.deb
@@ -55,25 +55,53 @@ function installZabbixAgent {
 
 	DEBIAN_FRONTEND=noninteractive \
 	apt -yqq install \
-	zabbix-agent \
+	zabbix-proxy-sqlite3 \
 	snmp \
 	snmp-mibs-downloader \
 	lftp
 
+	rm /etc/zabbix/zabbix_proxy.conf
+	find / -type f -name "zabbix.db" -delete
 
-	rm /etc/zabbix/zabbix_agentd.conf
+	mkdir /opt/zabbix
+	zcat /usr/share/doc/zabbix-proxy-sqlite3/schema.sql.gz | sqlite3 /opt/zabbix/zabbix.db
+	chmod -R 777 /opt/zabbix
+	sudo su beheer -c "echo \"${input_zabbix_psk}\" | tee /home/beheer/zabbix_proxy.psk"
 
-echo -e "PidFile=/var/run/zabbix/zabbix_agentd.pid
+echo -e "Server=zabbix.wijzijnde.it
+Hostname=$(hostname)_Zabbix
+PidFile=/var/run/zabbix/zabbix_proxy.pid
+SocketDir=/var/run/zabbix
 LogType=system
-Server=0.0.0.0/0
-ServerActive=127.0.0.1
-Hostname=$(hostname)
-AllowKey=system.run[*]
-Include=/etc/zabbix/zabbix_agentd.d/*.conf
-Timeout=30" | tee /etc/zabbix/zabbix_agentd.conf
+DBName=/tmp/zabbix.db
+DBUser=zabbix
+SNMPTrapperFile=/var/log/snmptrap.log
+Timeout=30
+ExternalScripts=/usr/lib/zabbix/externalscripts
+FpingLocation=/usr/bin/fping
+Fping6Location=/usr/bin/fping6
+EnableRemoteCommands=1
+LogSlowQueries=3000
+CacheSize=50M
+StartPingers=4
+StartPollers=10
+StartPollersUnreachable=10
+StatsAllowedIP=0.0.0.0/0
+StartIPMIPollers=1
+StartDiscoverers=5
+StartVMwareCollectors=1
+StartHTTPPollers=2
+HistoryCacheSize=50M
+HistoryIndexCacheSize=25M
+DataSenderFrequency=10
+ProxyOfflineBuffer=6
+TLSConnect=psk
+TLSPSKIdentity=ZabbixPSK
+TLSPSKFile=/home/beheer/zabbix_proxy.psk" | tee /etc/zabbix/zabbix_proxy.conf
 
-	
-
+systemctl enable zabbix-proxy
+service zabbix-proxy restart
+zabbix_proxy -R config_cache_reload
 
 
 
@@ -84,15 +112,13 @@ Timeout=30" | tee /etc/zabbix/zabbix_agentd.conf
 	wget -O /usr/share/snmp/mibs/FROGFOOT-RESOURCES-MIB.mib http://www.circitor.fr/Mibs/Mib/F/FROGFOOT-RESOURCES-MIB.mib
 	wget -O /usr/share/snmp/mibs/UBNT-MIB.mib http://dl.ubnt-ut.com/snmp/UBNT-MIB
 	wget -O /usr/share/snmp/mibs/UBNT-UniFi-MIB.mib http://dl.ubnt-ut.com/snmp/UBNT-UniFi-MIB
+	wget -O /usr/share/snmp/mibs/FORTINET-FORTIGATE-MIB.mib http://www.circitor.fr/Mibs/Mib/F/FORTINET-FORTIGATE-MIB.mib
 
 	# Download All MIBS from cisco
 lftp ftp.cisco.com << EOF
 	mirror -c /pub/mibs/v2 /usr/share/snmp/mibs
 	bye
 EOF
-
-	systemctl enable zabbix-agent
-	systemctl restart zabbix-agent.service
 
 	service zabbix-proxy restart
 	zabbix_proxy -R config_cache_reload
