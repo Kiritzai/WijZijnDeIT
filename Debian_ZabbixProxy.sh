@@ -80,6 +80,10 @@ function installZabbixProxy {
 	echo -e "${GREEN}#${RESET} Running apt-get upgrade..."
 	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade 2> /dev/null
 
+	echo -e "${GREEN}#${RESET} Fix broken packages..."
+	dpkg --configure -a
+	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install --fix-broken
+
 	echo -e "${GREEN}#${RESET} Installing zabbix-proxy-sqlite3..."
 	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install zabbix-proxy-sqlite3 2> /dev/null
 
