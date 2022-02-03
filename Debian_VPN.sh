@@ -245,7 +245,7 @@ dhcp-option=option:classless-static-route,${input_ip_route}
 #########################################" | tee /etc/dnsmasq.conf
 
 
-	# Backup /etc/dnsmasq.conf
+	# Backup /etc/softether-vpnserver.service
 	mv /lib/systemd/system/softether-vpnserver.service /lib/systemd/system/softether-vpnserver.service-backup
 
 echo -e "[Unit]
@@ -290,6 +290,7 @@ WantedBy=multi-user.target" | tee /lib/systemd/system/softether-vpnserver.servic
 	network=$(IFS=.; set -o noglob; set -- $input_gateway; printf '%s\n' "$1.$2.$3.0")
 
 	# make iptables ( To list rules : iptables -t nat -L -n -v )
+	iptables -t nat -A POSTROUTING -s 192.168.31.0/24 -j SNAT --to 192.168.11.5
     iptables -t nat -A POSTROUTING -s $network/24 -j SNAT --to-source $local_ip
 	iptables -I INPUT -p udp --dport 5555 -j ACCEPT
 	iptables -I FORWARD -s $network/24 -j ACCEPT
