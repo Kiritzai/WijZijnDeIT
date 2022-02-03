@@ -14,6 +14,15 @@ set +H
 # Software
 SOFTWARE="PreConfig"
 
+RESET='\033[0m'
+YELLOW='\033[1;33m'
+#GRAY='\033[0;37m'
+#WHITE='\033[1;37m'
+GRAY_R='\033[39m'
+WHITE_R='\033[39m'
+RED='\033[1;31m' # Light Red.
+GREEN='\033[1;32m' # Light Green.
+#BOLD='\e[1m'
 
 ############################
 #
@@ -55,7 +64,7 @@ exec 3>&1 1>>${logfile} 2>&1
 
 function message {
 	logdate=$(date "+%d %b %Y %H:%M:%S")
-    echo "${logdate} :: $1" | tee /dev/fd/3
+    echo -e "${logdate} :: ${GREEN}#${RESET} $1" | tee /dev/fd/3
 }
 
 
@@ -63,65 +72,58 @@ main () {
 	clear
 	echo "$BANNER"
 	changeSources
-
-	clear
-	echo "$BANNER"
 	installUtilities
-	
-	clear
-	echo "$BANNER"
 	setSudo
-
-	clear
-	echo "$BANNER"
 	changeGrub
-
-	clear
-	echo "$BANNER"
     disableWrites
-
-	clear
-	echo "$BANNER"
     smBusFix
-
-	clear
-	echo "$BANNER"
 	changeMotd
-
 	exit
 }
 
 function changeSources {
 
-	message "Adjusting sources"
+	message "Running apt-get clean..."
+	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' clean
 
-	DEBIAN_FRONTEND=noninteractive apt -yqq clean
+	message "Removing sources.list..."
 	rm /etc/apt/sources.list
+
+	message "Creating sources.list..."
 	echo "deb http://ftp.debian.org/debian/ stable contrib main non-free" | tee /etc/apt/sources.list
 	echo "deb-src http://ftp.debian.org/debian/ stable contrib main non-free" | tee -a /etc/apt/sources.list
 	echo "deb http://security.debian.org/debian-security stable-security contrib main non-free" | tee -a /etc/apt/sources.list
 	echo "deb-src http://security.debian.org/debian-security stable-security contrib main non-free" | tee -a /etc/apt/sources.list
 	echo "deb http://ftp.debian.org/debian/ stable-updates contrib main non-free" | tee -a /etc/apt/sources.list
 	echo "deb-src http://ftp.debian.org/debian/ stable-updates contrib main non-free" | tee -a /etc/apt/sources.list
-	#echo "deb http://deb.debian.org/debian stable-backports main" > /etc/apt/sources.list.d/backports.list
+	
+	message "Running apt-get update..."
 	DEBIAN_FRONTEND=noninteractive apt -yqq update
-	#DEBIAN_FRONTEND=noninteractive apt -yqq install --reinstall dpkg libc-bin 
-	DEBIAN_FRONTEND=noninteractive apt -yqq update
-	DEBIAN_FRONTEND=noninteractive apt -yqq upgrade
-	DEBIAN_FRONTEND=noninteractive apt -yqq autoremove
+	
+	message "Running apt-get upgrade..."
+	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade
+
+	message "Running apt-get autoremove..."
+	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' autoremove
+
 }
 
 function installUtilities {
 
-    message "Installing packages... this can take a while!"
+	message "Installing mlocate..."
+	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install mlocate
 
-	DEBIAN_FRONTEND=noninteractive \
-	apt-get -yqq install  \
-	mlocate \
-	open-vm-tools \
-	sudo \
-	curl \
-    git
+	message "Installing open-vm-tools..."
+	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install open-vm-tools
+
+	message "Installing sudo..."
+	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install sudo
+
+	message "Installing curl..."
+	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install curl
+
+	message "Installing git..."
+	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install git
 	
     # Update Locate datebase after installation
 	updatedb
