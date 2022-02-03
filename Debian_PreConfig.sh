@@ -106,6 +106,10 @@ function changeSources {
 	message "Running apt-get autoremove..."
 	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' autoremove
 
+	message "Fix broken packages..."
+	dpkg --configure -a
+	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install --fix-broken
+
 }
 
 function installUtilities {
