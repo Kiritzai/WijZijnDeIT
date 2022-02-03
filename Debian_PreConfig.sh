@@ -25,9 +25,7 @@ GREEN='\033[1;32m' # Light Green.
 #BOLD='\e[1m'
 
 ############################
-#
 ## Installation
-#
 ############################
 
 clear
@@ -50,10 +48,9 @@ EOF
 echo "$BANNER"
 read -s -p $'\tPress enter to continue...\n' -n 1 -r
 
+
 ############################
-#
-## Parameters
-#
+## Log Settings
 ############################
 
 # Log file
@@ -66,6 +63,7 @@ function message {
 	logdate=$(date "+%d %b %Y %H:%M:%S")
     echo -e "${logdate} :: ${GREEN}#${RESET} $1" | tee /dev/fd/3
 }
+
 
 
 main () {
