@@ -60,6 +60,23 @@ EOF
 read -p $'\tPSK: ' input_zabbix_psk < /dev/tty
 
 
+############################
+## Log Settings
+############################
+
+# Log file
+logfile="$PWD/log.log"
+
+# Log execute
+exec 3>&1 1>>${logfile} 2>&1
+
+function message {
+	logdate=$(date "+%d %b %Y %H:%M:%S")
+    echo -e "${logdate} :: ${GREEN}#${RESET} $1" | tee /dev/fd/3
+}
+
+
+
 main () {
 	clear
 	echo "$BANNER"
@@ -70,45 +87,48 @@ main () {
 function installZabbixProxy {
 
 	# Installing Zabbix Repo
-	wget https://repo.zabbix.com/zabbix/5.4/debian/pool/main/z/zabbix-release/zabbix-release_5.4-1+debian11_all.deb 2> /dev/null
-	dpkg -i zabbix-release_5.4-1+debian11_all.deb 2> /dev/null
+	wget https://repo.zabbix.com/zabbix/5.4/debian/pool/main/z/zabbix-release/zabbix-release_5.4-1+debian11_all.deb
+	dpkg -i zabbix-release_5.4-1+debian11_all.deb
 
 	# Updating repository
-	echo -e "${GREEN}#${RESET} Running apt-get update..."
-	DEBIAN_FRONTEND=noninteractive apt -yqq update 2> /dev/null
+	message "Running apt-get update..."
+	DEBIAN_FRONTEND=noninteractive apt -yqq update
 	
-	echo -e "${GREEN}#${RESET} Running apt-get upgrade..."
-	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade 2> /dev/null
+	message "Running apt-get upgrade..."
+	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade
 
-	echo -e "${GREEN}#${RESET} Fix broken packages..."
+	message "Fix broken packages..."
 	dpkg --configure -a
 	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install --fix-broken
 
-	echo -e "${GREEN}#${RESET} Installing zabbix-proxy-sqlite3..."
-	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install zabbix-proxy-sqlite3 2> /dev/null
+	message "Installing zabbix-proxy-sqlite3..."
+	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install zabbix-proxy-sqlite3
 
-	echo -e "${GREEN}#${RESET} Installing snmp..."
-	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install snmp 2> /dev/null
+	message "Installing zabbix-agent..."
+	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install zabbix-agent
 
-	echo -e "${GREEN}#${RESET} Installing snmp-mibs-downloader..."
-	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install snmp-mibs-downloader 2> /dev/null
+	message "Installing snmp..."
+	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install snmp
 
-	echo -e "${GREEN}#${RESET} Installing lftp..."
-	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install lftp 2> /dev/null
+	message "Installing snmp-mibs-downloader..."
+	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install snmp-mibs-downloader
 
-	echo -e "${GREEN}#${RESET} Removing zabbix proxy residue..."
-	rm /etc/zabbix/zabbix_proxy.conf 2> /dev/null
-	find / -type f -name "zabbix.db" -delete 2> /dev/null
+	message "Installing lftp..."
+	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install lftp
 
-	echo -e "${GREEN}#${RESET} Creating SQLite database..."
-	mkdir /opt/zabbix 2> /dev/null
-	zcat /usr/share/doc/zabbix-proxy-sqlite3/schema.sql.gz | sqlite3 /opt/zabbix/zabbix.db 2> /dev/null
-	chmod -R 777 /opt/zabbix 2> /dev/null
+	message "Removing zabbix proxy residue..."
+	rm /etc/zabbix/zabbix_proxy.conf
+	find / -type f -name "zabbix.db" -delete
 
-	echo -e "${GREEN}#${RESET} Create PSK file..."
-	echo "${input_zabbix_psk}" | tee /opt/zabbix/zabbix_proxy.psk 2> /dev/null
+	message "Creating SQLite database..."
+	mkdir /opt/zabbix
+	zcat /usr/share/doc/zabbix-proxy-sqlite3/schema.sql.gz | sqlite3 /opt/zabbix/zabbix.db
+	chmod -R 777 /opt/zabbix
 
-	echo -e "${GREEN}#${RESET} Create config file..."
+	message "Create PSK file..."
+	echo "${input_zabbix_psk}" | tee /opt/zabbix/zabbix_proxy.psk
+
+	message "Create config file..."
 echo -e "Server=zabbix.wijzijnde.it
 Hostname=$(hostname)_Zabbix
 PidFile=/var/run/zabbix/zabbix_proxy.pid
@@ -138,18 +158,18 @@ DataSenderFrequency=10
 ProxyOfflineBuffer=6
 TLSConnect=psk
 TLSPSKIdentity=ZabbixPSK
-TLSPSKFile=/opt/zabbix/zabbix_proxy.psk" | tee /etc/zabbix/zabbix_proxy.conf 2> /dev/null
+TLSPSKFile=/opt/zabbix/zabbix_proxy.psk" | tee /etc/zabbix/zabbix_proxy.conf
 
-	echo -e "${GREEN}#${RESET} Enable SNMP..."
-	sed -i "s/^\(mibs *:\).*/#\1/" /etc/snmp/snmp.conf 2> /dev/null
+	message "Enable SNMP..."
+	sed -i "s/^\(mibs *:\).*/#\1/" /etc/snmp/snmp.conf
 
-	echo -e "${GREEN}#${RESET} Downloading SNMP MIBS..."
-	download-mibs 2> /dev/null
+	message "Downloading SNMP MIBS..."
+	download-mibs
 
-	wget -O /usr/share/snmp/mibs/FROGFOOT-RESOURCES-MIB.mib http://www.circitor.fr/Mibs/Mib/F/FROGFOOT-RESOURCES-MIB.mib 2> /dev/null
-	wget -O /usr/share/snmp/mibs/UBNT-MIB.mib http://dl.ubnt-ut.com/snmp/UBNT-MIB 2> /dev/null
-	wget -O /usr/share/snmp/mibs/UBNT-UniFi-MIB.mib http://dl.ubnt-ut.com/snmp/UBNT-UniFi-MIB 2> /dev/null
-	wget -O /usr/share/snmp/mibs/FORTINET-FORTIGATE-MIB.mib http://www.circitor.fr/Mibs/Mib/F/FORTINET-FORTIGATE-MIB.mib 2> /dev/null
+	wget -O /usr/share/snmp/mibs/FROGFOOT-RESOURCES-MIB.mib http://www.circitor.fr/Mibs/Mib/F/FROGFOOT-RESOURCES-MIB.mib
+	wget -O /usr/share/snmp/mibs/UBNT-MIB.mib http://dl.ubnt-ut.com/snmp/UBNT-MIB
+	wget -O /usr/share/snmp/mibs/UBNT-UniFi-MIB.mib http://dl.ubnt-ut.com/snmp/UBNT-UniFi-MIB
+	wget -O /usr/share/snmp/mibs/FORTINET-FORTIGATE-MIB.mib http://www.circitor.fr/Mibs/Mib/F/FORTINET-FORTIGATE-MIB.mib
 
 	# Download All MIBS from cisco
 #lftp ftp.cisco.com << EOF
@@ -157,9 +177,21 @@ TLSPSKFile=/opt/zabbix/zabbix_proxy.psk" | tee /etc/zabbix/zabbix_proxy.conf 2> 
 	#bye
 #EOF
 
-	systemctl enable zabbix-proxy 2> /dev/null
-	service zabbix-proxy restart 2> /dev/null
-	zabbix_proxy -R config_cache_reload 2> /dev/null
+	systemctl enable zabbix-proxy
+	service zabbix-proxy restart
+	zabbix_proxy -R config_cache_reload
+
+echo -e "PidFile=/var/run/zabbix/zabbix_agentd.pid
+LogType=system
+Server=0.0.0.0/0
+ServerActive=127.0.0.1
+Hostname=$(hostname)
+AllowKey=system.run[*]
+Include=/etc/zabbix/zabbix_agentd.d/*.conf
+Timeout=30" | tee /etc/zabbix/zabbix_agentd.conf
+
+	systemctl enable zabbix-agent
+	systemctl restart zabbix-agent.service
 
 }
 
