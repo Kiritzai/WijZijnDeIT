@@ -120,6 +120,7 @@ function installZabbixProxy {
 	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install lftp
 
 	message "Removing zabbix proxy residue..."
+	rm -rf /opt/zabbix
 	rm /etc/zabbix/zabbix_proxy.conf
 	find / -type f -name "zabbix.db" -delete
 
