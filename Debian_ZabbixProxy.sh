@@ -87,8 +87,8 @@ main () {
 function installZabbixProxy {
 
 	# Installing Zabbix Repo
-	wget https://repo.zabbix.com/zabbix/5.4/debian/pool/main/z/zabbix-release/zabbix-release_5.4-1+debian11_all.deb
-	dpkg -i zabbix-release_5.4-1+debian11_all.deb
+	wget https://repo.zabbix.com/zabbix/6.0/debian/pool/main/z/zabbix-release/zabbix-release_6.0-1+debian$(cut -d"." -f1 /etc/debian_version)_all.deb
+	dpkg -i zabbix-release_6.0-1+debian$(cut -d"." -f1 /etc/debian_version)_all.deb
 
 	# Updating repository
 	message "Running apt-get update..."
@@ -100,6 +100,9 @@ function installZabbixProxy {
 	message "Fix broken packages..."
 	dpkg --configure -a
 	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install --fix-broken
+
+	message "Installing zabbix-sql-scripts..."
+	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install zabbix-sql-scripts
 
 	message "Installing zabbix-proxy-sqlite3..."
 	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install zabbix-proxy-sqlite3
@@ -122,7 +125,7 @@ function installZabbixProxy {
 
 	message "Creating SQLite database..."
 	mkdir /opt/zabbix
-	zcat /usr/share/doc/zabbix-proxy-sqlite3/schema.sql.gz | sqlite3 /opt/zabbix/zabbix.db
+	cat /usr/share/doc/zabbix-sql-scripts/sqlite3/proxy.sql | sqlite3 /opt/zabbix/zabbix.db
 	chmod -R 777 /opt/zabbix
 
 	message "Create PSK file..."
@@ -146,7 +149,7 @@ LogSlowQueries=3000
 CacheSize=50M
 StartPingers=4
 StartPollers=10
-StartPollersUnreachable=10
+StartPollersUnreachable=4
 StatsAllowedIP=0.0.0.0/0
 StartIPMIPollers=1
 StartDiscoverers=5
