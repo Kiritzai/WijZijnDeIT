@@ -181,10 +181,12 @@ TLSPSKFile=/opt/zabbix/zabbix_proxy.psk" | tee /etc/zabbix/zabbix_proxy.conf
 	#bye
 #EOF
 
+	message "Restarting zabbix proxy..."
 	systemctl enable zabbix-proxy
 	service zabbix-proxy restart
 	zabbix_proxy -R config_cache_reload
 
+	message "Create agent config..."
 echo -e "PidFile=/var/run/zabbix/zabbix_agentd.pid
 LogType=system
 Server=0.0.0.0/0
@@ -194,6 +196,7 @@ AllowKey=system.run[*]
 Include=/etc/zabbix/zabbix_agentd.d/*.conf
 Timeout=30" | tee /etc/zabbix/zabbix_agentd.conf
 
+	message "Restarting zabbix agent..."
 	systemctl enable zabbix-agent
 	systemctl restart zabbix-agent.service
 
