@@ -21,7 +21,7 @@ if ($confirmation -eq 'y') {
 
 		Write-Host "Reset and Wiping computer..." -ForegroundColor Yellow
 
-		Set-ExecutionPolicy -Scope Currentuser Unrestricted -force
+		Set-ExecutionPolicy -Scope Currentuser Unrestricted -Force
 		$ErrorActionPreference= 'silentlycontinue'
 		$global:ProgressPreference = 'SilentlyContinue'
 		New-Item -Path c:\programdata\customscripts -ItemType Directory -Force -Confirm:$false | out-null
