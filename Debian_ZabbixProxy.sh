@@ -197,6 +197,8 @@ Timeout=30" | tee /etc/zabbix/zabbix_agentd.conf
 	systemctl enable zabbix-agent
 	systemctl restart zabbix-agent.service
 
+	message "Finished"
+
 }
 
 main
