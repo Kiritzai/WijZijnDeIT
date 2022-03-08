@@ -39,34 +39,65 @@ EOF
 echo "$BANNER"
 read -s -p $'\tPress enter to continue...\n' -n 1 -r
 
+clear
+echo "$BANNER"
+
+############################
+## Log Settings
+############################
+
+# Log file
+logfile="$PWD/log.log"
+
+# Log execute
+exec 3>&1 1>>${logfile} 2>&1
+
+function message {
+	logdate=$(date "+%d %b %Y %H:%M:%S")
+    echo -e "${logdate} :: ${GREEN}#${RESET} $1" | tee /dev/fd/3
+}
+
 main () {
 	installZabbixAgent
 }
 
-
 function installZabbixAgent {
 
+	message "Running apt-get clean..."
+	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' clean
+
 	# Installing Zabbix Repo
-	wget https://repo.zabbix.com/zabbix/5.4/debian/pool/main/z/zabbix-release/zabbix-release_5.4-1+debian11_all.deb
-	dpkg -i zabbix-release_5.4-1+debian11_all.deb
+	wget https://repo.zabbix.com/zabbix/6.0/debian/pool/main/z/zabbix-release/zabbix-release_6.0-1+debian$(cut -d"." -f1 /etc/debian_version)_all.deb
+	dpkg -i zabbix-release_6.0-1+debian$(cut -d"." -f1 /etc/debian_version)_all.deb
 
-	# Updating repository
+	message "Running apt-get update..."
 	DEBIAN_FRONTEND=noninteractive apt -yqq update
+	
+	message "Running apt-get upgrade..."
+	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade
 
-	DEBIAN_FRONTEND=noninteractive \
-	apt -yqq install \
-	zabbix-agent
+	message "Running apt-get autoremove..."
+	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' autoremove
+
+	message "Fix broken packages..."
+	dpkg --configure -a
+	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install --fix-broken
+
+	message "Installing zabbix-agent..."
+	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install zabbix-agent
 
 	rm /etc/zabbix/zabbix_agentd.conf
 
-echo -e "PidFile=/var/run/zabbix/zabbix_agentd.pid
+cat > /etc/zabbix/zabbix_agentd.conf <<EOF
+PidFile=/var/run/zabbix/zabbix_agentd.pid
 LogType=system
 Server=0.0.0.0/0
 ServerActive=127.0.0.1
 Hostname=$(hostname)
 AllowKey=system.run[*]
 Include=/etc/zabbix/zabbix_agentd.d/*.conf
-Timeout=30" | tee /etc/zabbix/zabbix_agentd.conf
+Timeout=30
+EOF
 
 	systemctl enable zabbix-agent
 	systemctl restart zabbix-agent.service
