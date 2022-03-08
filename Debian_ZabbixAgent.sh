@@ -88,9 +88,9 @@ function installZabbixAgent {
 	message "Running apt-get autoremove..."
 	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' autoremove
 
-	message "Fix broken packages..."
-	dpkg --configure -a
-	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install --fix-broken
+	#message "Fix broken packages..."
+	#dpkg --configure -a
+	#DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install --fix-broken
 
 	message "Installing zabbix-agent..."
 	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install zabbix-agent
