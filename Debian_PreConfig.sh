@@ -47,7 +47,8 @@ EOF
 )
 echo "$BANNER"
 read -s -p $'\tPress enter to continue...\n' -n 1 -r
-
+clear
+echo "$BANNER"
 
 ############################
 ## Log Settings
@@ -67,8 +68,6 @@ function message {
 
 
 main () {
-	clear
-	echo "$BANNER"
 	changeSources
 	installUtilities
 	setSudo
