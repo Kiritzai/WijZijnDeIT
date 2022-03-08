@@ -124,6 +124,24 @@ cat <<EOF
 EOF
 
 read -p $'\tCorrect? (Y/N): ' confirm && [[ $confirm == [yY] ]] || exit 1
+clear
+echo "$BANNER"
+
+############################
+## Log Settings
+############################
+
+# Log file
+logfile="$PWD/log.log"
+
+# Log execute
+exec 3>&1 1>>${logfile} 2>&1
+
+function message {
+	logdate=$(date "+%d %b %Y %H:%M:%S")
+    echo -e "${logdate} :: ${GREEN}#${RESET} $1" | tee /dev/fd/3
+}
+
 
 main () {
 	installVPN
@@ -132,14 +150,17 @@ main () {
 
 function installVPN {
 
-	# Updating repository
-	DEBIAN_FRONTEND=noninteractive apt -yqq update
+	message "Running apt-get update..."
+	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' update
 
-	DEBIAN_FRONTEND=noninteractive \
-	apt-get -yqq install \
-	iptables-persistent \
-	softether-vpnserver \
-	dnsmasq
+	message "Installing iptables-persistent..."
+	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install iptables-persistent
+
+	message "Installing softether-vpnserver..."
+	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install softether-vpnserver
+	
+	message "Installing dnsmasq..."
+	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install dnsmasq
 
 	#echo "interface=tap_soft" | tee -a /etc/dnsmasq.conf
 	#echo "dhcp-range=tap_soft,${input_dhcp_scope},12h" | tee -a /etc/dnsmasq.conf
@@ -205,7 +226,7 @@ bogus-priv
 # Domain
 domain=${input_domain_name}
 
- Set the DHCP server to authoritative mode. In this mode it will barge in
+# Set the DHCP server to authoritative mode. In this mode it will barge in
 # and take over the lease for any client which broadcasts on the network,
 # whether it has a record of the lease or not. This avoids long timeouts
 # when a machine wakes up on a new network. DO NOT enable this if there's
@@ -245,13 +266,15 @@ dhcp-option=option:classless-static-route,${input_ip_route}
 #########################################" | tee /etc/dnsmasq.conf
 
 
+
 	# Backup /etc/softether-vpnserver.service
 	mv /lib/systemd/system/softether-vpnserver.service /lib/systemd/system/softether-vpnserver.service-backup
+
+	# Creating Softether Service
 
 echo -e "[Unit]
 Description=SoftEther VPN Server
 After=network-online.target auditd.service
-Wants=network-online.target
 
 [Service]
 Type=forking
@@ -259,8 +282,15 @@ TasksMax=629145
 EnvironmentFile=-/etc/defaults/softether-vpnserver
 ExecStart=/usr/libexec/softether/vpnserver/vpnserver start
 ExecStop=/usr/libexec/softether/vpnserver/vpnserver stop
-ExecStartPost=sleep 3
-ExecStartPost=/usr/sbin/ifconfig tap_soft ${$input_gateway}
+ExecStartPost=/bin/sleep 05
+ExecStartPost=/bin/bash /opt/softether-iptables.sh
+ExecStartPost=/bin/sleep 03
+ExecStartPost=/bin/systemctl start dnsmasq.service
+ExecReload=/bin/sleep 05
+ExecReload=/bin/bash /root/softether-iptables.sh
+ExecReload=/bin/sleep 03
+ExecReload=/bin/systemctl restart dnsmasq.service
+ExecStopPost=/bin/systemctl stop dnsmasq.service
 KillMode=mixed
 RestartSec=5s
 Restart=on-failure
@@ -284,17 +314,44 @@ WantedBy=multi-user.target" | tee /lib/systemd/system/softether-vpnserver.servic
 	sed -i '/Test the config file and refuse starting if it is not valid/a ExecStartPre=/\bin/\sleep 3' /lib/systemd/system/dnsmasq.service
 
 	# Grab local IP Address
-	local_ip=$(ip addr | grep inet | grep -v inet6 | grep -vE '127\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | cut -d '/' -f 1 | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}')
+	local_ip=$(ifconfig $(netstat -rn | grep -E "^default|^0.0.0.0" | head -1 | awk '{print $NF}') | grep 'inet ' | awk '{print $2}' | grep -Eo '([0-9]*\.){3}[0-9]*')
 
 	# Create from gateway an network address
 	network=$(IFS=.; set -o noglob; set -- $input_gateway; printf '%s\n' "$1.$2.$3.0")
 
 	# make iptables ( To list rules : iptables -t nat -L -n -v )
-	iptables -t nat -A POSTROUTING -s 192.168.31.0/24 -j SNAT --to 192.168.11.5
-    iptables -t nat -A POSTROUTING -s $network/24 -j SNAT --to-source $local_ip
-	iptables -I INPUT -p udp --dport 5555 -j ACCEPT
-	iptables -I FORWARD -s $network/24 -j ACCEPT
-	iptables -I FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+cat > /opt/softether-iptables.sh <<EOF
+#!/bin/bash
+
+# Flush Current rules
+iptables -F && iptables -X
+
+#######################################################################################
+# Base SoftEther VPN Rules for IPTables
+#######################################################################################
+
+# Assign tap_soft to tap interface
+/usr/sbin/ifconfig tap_soft ${input_gateway}
+
+iptables -t nat -A POSTROUTING -s ${network}/24 -j SNAT --to-source ${local_ip}
+
+# Allow VPN Interface to access the whole world, back and forth.
+iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+iptables -A INPUT -s ${network}/24 -m state --state NEW -j ACCEPT
+iptables -A OUTPUT -s ${network}/24 -m state --state NEW -j ACCEPT
+iptables -A FORWARD -s ${network}/24 -m state --state NEW -j ACCEPT
+
+#######################################################################################
+# End of Base IPTables Rules
+#######################################################################################
+EOF
+
+	# Make iptables script executable
+	chmod +x /opt/softether-iptables.sh
 
 }
 
