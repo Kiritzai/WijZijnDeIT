@@ -88,6 +88,8 @@ function installZabbixAgent {
 
 	rm /etc/zabbix/zabbix_agentd.conf
 
+	message "Creating config file..."
+
 cat > /etc/zabbix/zabbix_agentd.conf <<EOF
 PidFile=/var/run/zabbix/zabbix_agentd.pid
 LogType=system
@@ -99,8 +101,11 @@ Include=/etc/zabbix/zabbix_agentd.d/*.conf
 Timeout=30
 EOF
 
+	message "Enable zabbix-agent..."
 	systemctl enable zabbix-agent
 	systemctl restart zabbix-agent.service
+
+	message "Finished installing ${SOFTWARE}..."
 
 }
 
