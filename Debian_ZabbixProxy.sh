@@ -59,6 +59,8 @@ cat <<EOF
 EOF
 read -p $'\tPSK: ' input_zabbix_psk < /dev/tty
 
+clear
+echo "$BANNER"
 
 ############################
 ## Log Settings
@@ -78,8 +80,6 @@ function message {
 
 
 main () {
-	clear
-	echo "$BANNER"
 	installZabbixProxy
 }
 
