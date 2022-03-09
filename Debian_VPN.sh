@@ -14,6 +14,15 @@ set +H
 # Software
 SOFTWARE="VPN"
 
+RESET='\033[0m'
+YELLOW='\033[1;33m'
+#GRAY='\033[0;37m'
+#WHITE='\033[1;37m'
+GRAY_R='\033[39m'
+WHITE_R='\033[39m'
+RED='\033[1;31m' # Light Red.
+GREEN='\033[1;32m' # Light Green.
+#BOLD='\e[1m'
 
 ##################
 ## Installation ##
@@ -45,7 +54,7 @@ clear
 echo "$BANNER"
 cat <<EOF
 
-	What DHCP Scope IP should OpenVPN use?
+	What DHCP Scope IP should ${SOFTWARE} use?
 	Always use 0 [zero] on the last octet.
 
 	Example: 192.168.30.1,192.168.30.250
@@ -119,7 +128,7 @@ cat <<EOF
 	IP Route: ${input_ip_route}
 	Gateway: ${input_gateway}
 
-	Are these your settings?
+	Are these settings correct?
  
 EOF
 
@@ -153,18 +162,11 @@ function installVPN {
 	message "Running apt-get update..."
 	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' update
 
-	message "Installing iptables-persistent..."
-	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install iptables-persistent
-
 	message "Installing softether-vpnserver..."
 	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install softether-vpnserver
 	
 	message "Installing dnsmasq..."
 	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install dnsmasq
-
-	#echo "interface=tap_soft" | tee -a /etc/dnsmasq.conf
-	#echo "dhcp-range=tap_soft,${input_dhcp_scope},12h" | tee -a /etc/dnsmasq.conf
-	#echo "dhcp-option=tap_soft,3,${input_gateway}" | tee -a /etc/dnsmasq.conf
 
 	echo 'net.ipv4.ip_forward=1' | tee /etc/sysctl.d/ipv4_forwarding.conf
 	sysctl --system
@@ -308,10 +310,10 @@ CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE CAP_NET_BROADCAST CAP_N
 WantedBy=multi-user.target" | tee /lib/systemd/system/softether-vpnserver.service
 
 	# Depends on SoftEther vpnserver
-	sed -i "s/After=network.target/After=softether-vpnserver.service network.target/g" /lib/systemd/system/dnsmasq.service
+	#sed -i "s/After=network.target/After=softether-vpnserver.service network.target/g" /lib/systemd/system/dnsmasq.service
 
 	# Let tap_soft interface be created before starting
-	sed -i '/Test the config file and refuse starting if it is not valid/a ExecStartPre=/\bin/\sleep 3' /lib/systemd/system/dnsmasq.service
+	#sed -i '/Test the config file and refuse starting if it is not valid/a ExecStartPre=/\bin/\sleep 3' /lib/systemd/system/dnsmasq.service
 
 	# Grab local IP Address
 	local_ip=$(ifconfig $(netstat -rn | grep -E "^default|^0.0.0.0" | head -1 | awk '{print $NF}') | grep 'inet ' | awk '{print $2}' | grep -Eo '([0-9]*\.){3}[0-9]*')
@@ -332,7 +334,7 @@ iptables -F && iptables -X
 #######################################################################################
 
 # Assign tap_soft to tap interface
-/usr/sbin/ifconfig tap_soft ${input_gateway}
+/sbin/ifconfig tap_soft ${input_gateway}
 
 iptables -t nat -A POSTROUTING -s ${network}/24 -j SNAT --to-source ${local_ip}
 
