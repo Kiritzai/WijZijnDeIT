@@ -174,6 +174,9 @@ function installVPN {
 	# Backup /etc/dnsmasq.conf
 	mv /etc/dnsmasq.conf /etc/dnsmasq.conf-backup
 
+	# Create dnsmasq config
+	message "Creating dnsmasq configuration..."
+
 echo -e "##################################################################################
 # SoftEther VPN server dnsmasq.conf
 ################################################################################## Interface Settings
@@ -267,12 +270,11 @@ dhcp-option=option:classless-static-route,${input_ip_route}
 
 #########################################" | tee /etc/dnsmasq.conf
 
-
-
 	# Backup /etc/softether-vpnserver.service
 	mv /lib/systemd/system/softether-vpnserver.service /lib/systemd/system/softether-vpnserver.service-backup
 
 	# Creating Softether Service
+	message "Create service file..."
 
 echo -e "[Unit]
 Description=SoftEther VPN Server
@@ -309,19 +311,15 @@ CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE CAP_NET_BROADCAST CAP_N
 [Install]
 WantedBy=multi-user.target" | tee /lib/systemd/system/softether-vpnserver.service
 
-	# Depends on SoftEther vpnserver
-	#sed -i "s/After=network.target/After=softether-vpnserver.service network.target/g" /lib/systemd/system/dnsmasq.service
-
-	# Let tap_soft interface be created before starting
-	#sed -i '/Test the config file and refuse starting if it is not valid/a ExecStartPre=/\bin/\sleep 3' /lib/systemd/system/dnsmasq.service
-
 	# Grab local IP Address
 	local_ip=$(ifconfig $(netstat -rn | grep -E "^default|^0.0.0.0" | head -1 | awk '{print $NF}') | grep 'inet ' | awk '{print $2}' | grep -Eo '([0-9]*\.){3}[0-9]*')
 
 	# Create from gateway an network address
 	network=$(IFS=.; set -o noglob; set -- $input_gateway; printf '%s\n' "$1.$2.$3.0")
 
-	# make iptables ( To list rules : iptables -t nat -L -n -v )
+	# ( To list rules : iptables -t nat -L -n -v )
+
+	message "Create iptables script..."
 
 cat > /opt/softether-iptables.sh <<EOF
 #!/bin/bash
@@ -355,7 +353,9 @@ EOF
 	# Make iptables script executable
 	chmod +x /opt/softether-iptables.sh
 
+	message "Finished, reboot the server!"
+
 }
 
 main
-reboot
+#reboot
