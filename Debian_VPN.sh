@@ -87,19 +87,6 @@ EOF
 read -p $'\tDNS: ' input_dns_server < /dev/tty
 
 
-# Domain Name
-clear
-echo "$BANNER"
-cat <<EOF
-
-	Enter FQDN of local domain
-	
-	Example: domain.lan
- 
-EOF
-read -p $'\tDomain: ' input_domain_name < /dev/tty
-
-
 # Route
 clear
 echo "$BANNER"
@@ -124,7 +111,6 @@ cat <<EOF
 
 	DHCP Scope: ${input_dhcp_scope}
 	DNS Server: ${input_dns_server}
-	Domain Name: ${input_domain_name}
 	IP Route: ${input_ip_route}
 	Gateway: ${input_gateway}
 
@@ -229,7 +215,7 @@ dhcp-no-override
 bogus-priv
 
 # Domain
-domain=${input_domain_name}
+domain=$(dnsdomainname)
 
 # Set the DHCP server to authoritative mode. In this mode it will barge in
 # and take over the lease for any client which broadcasts on the network,
@@ -244,7 +230,7 @@ dhcp-authoritative
 ################################################################################## External DNS Servers
 
 # Use this DNS servers for incoming DNS requests
-server=/${input_domain_name}/${input_dns_server}
+server=/$(dnsdomainname)/${input_dns_server}
 server=8.8.8.8
 server=8.8.4.4
 
@@ -353,7 +339,8 @@ EOF
 	# Make iptables script executable
 	chmod +x /opt/softether-iptables.sh
 
-	message "Finished, reboot the server!"
+	message "Finished!"
+	message "Connect with SoftEther Manager and create new soft adapter, then reboot"
 
 }
 
