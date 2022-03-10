@@ -55,9 +55,8 @@ echo "$BANNER"
 cat <<EOF
 
 	What DHCP Scope IP should ${SOFTWARE} use?
-	Always use 0 [zero] on the last octet.
 
-	Example: 192.168.30.1,192.168.30.250
+	Example: 192.168.30.10,192.168.30.250
  
 EOF
 read -p $'\tScope: ' input_dhcp_scope < /dev/tty
