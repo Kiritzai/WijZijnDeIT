@@ -341,6 +341,9 @@ EOF
 	# Make iptables script executable
 	chmod +x /opt/softether-iptables.sh
 
+	# The unit files needs to be reloaded
+	systemctl daemon-reload
+
 	message "Finished!"
 	message "Connect with SoftEther Manager and create new soft adapter, then reboot"
 
