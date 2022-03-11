@@ -97,10 +97,6 @@ function installZabbixProxy {
 	message "Running apt-get upgrade..."
 	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade
 
-	message "Fix broken packages..."
-	dpkg --configure -a
-	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install --fix-broken
-
 	message "Installing zabbix-sql-scripts..."
 	DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install zabbix-sql-scripts
 
