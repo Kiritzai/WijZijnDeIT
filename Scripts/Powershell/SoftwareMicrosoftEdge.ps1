@@ -3,13 +3,15 @@
 
 Clear-Host
 
+# Generate Random String
+$random_name = -join ((48..57) + (97..122) | Get-Random -Count 32 | ForEach-Object {[char]$_})
+
 # Disable first Run Explorer
 [microsoft.win32.registry]::SetValue("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Internet Explorer\Main", "DisableFirstRunCustomize", 2)
 
 #OPTIONAL CONFIGURATION:
 $jsonUrl = "https://edgeupdates.microsoft.com/api/products"
-$temporaryInstallerPath = Join-Path $Env:TEMP -ChildPath "InstallMicrosoftEdge.msi"
-
+$temporaryInstallerPath = Join-Path $Env:TEMP -ChildPath "$random_name.msi"
 
 $result = Invoke-WebRequest -Uri $jsonUrl | ConvertFrom-Json
 $result = $result | Where-Object { $_.Product -like "Stable" }
