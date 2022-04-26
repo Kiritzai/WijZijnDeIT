@@ -3,7 +3,7 @@
 set +H
 
 # Actual Command to Run
-# bash <(wget --no-cache -O - https://github.com/Kiritzai/WijZijnDeIT/raw/master/Debian_PreConfig.sh)
+# bash <(wget --no-cache -O - https://github.com/Kiritzai/WijZijnDeIT/raw/master/Arch_PreConfig)
 # curl -sSL https://github.com/Kiritzai/WijZijnDeIT/raw/master/Debian_PreConfig.sh | bash
 
 
@@ -70,11 +70,12 @@ function message {
 main () {
 	changeSources
 	installUtilities
+	fixCache
 	#setSudo
 	#changeGrub
-    disableWrites
-    smBusFix
-	changeMotd
+    #disableWrites
+    #smBusFix
+	#changeMotd
 	exit
 }
 
