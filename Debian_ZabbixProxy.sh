@@ -130,7 +130,7 @@ function installZabbixProxy {
 
 	message "Create config file..."
 echo -e "Server=zabbix.wijzijnde.it
-Hostname=$(hostname)_Zabbix
+Hostname=$(hostname)
 PidFile=/var/run/zabbix/zabbix_proxy.pid
 SocketDir=/var/run/zabbix
 LogType=system
