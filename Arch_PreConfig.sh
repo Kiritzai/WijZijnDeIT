@@ -87,8 +87,7 @@ function changeSources {
 	message "Updating..."
 	pacman --noconfirm -Syyu
 
-
-#Include = /etc/pacman.d/mirrorlist
+	#Include = /etc/pacman.d/mirrorlist
 
 }
 
@@ -98,7 +97,7 @@ function installUtilities {
 	pacman --noconfirm --needed -S git
 	cd /opt
 	git clone https://aur.archlinux.org/yay-git.git
-	chown -R remy:remy ./yay-git
+	chown -R beheer:beheer ./yay-git
 	ls -al
 	cd yay-git/
 	makepkg -si
@@ -108,6 +107,12 @@ function installUtilities {
 
 	message "Installing unrar"
 	pacman --noconfirm --needed -S unrar
+
+	# Iterate the string array using for loop
+	for app in ${AppArray[@]}; do
+		message "Installing $app..."
+		DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install $app
+	done
 
 }
 
