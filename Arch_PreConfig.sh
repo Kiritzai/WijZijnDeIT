@@ -106,6 +106,7 @@ function installUtilities {
 	declare -a AppArray=("open-vm-tools" \
 							"sudo" \
 							"curl" \
+							"openssh" \
 							"ntfs" \
 							"unrar" \
 							"git")
@@ -115,6 +116,10 @@ function installUtilities {
 		message "Installing $app..."
 		pacman --noconfirm --needed -S $app
 	done
+
+	# Starting and enable SSH
+	systemctl enable sshd
+	systemctl start sshd
 
 }
 
