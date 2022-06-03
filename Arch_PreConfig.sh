@@ -62,7 +62,7 @@ exec 3>&1 1>>${logfile} 2>&1
 
 function message {
 	logdate=$(date "+%d %b %Y %H:%M:%S")
-    echo -e "${logdate} :: ${GREEN}#${RESET} $1" | tee /dev/fd/3
+    echo -e "${logdate} :: ${GREEN}#${RESET} [+] $1" | tee /dev/fd/3
 }
 
 
@@ -102,16 +102,18 @@ function installUtilities {
 	cd yay-git/
 	makepkg -si
 
-	message "Installing ntfs"
-	pacman --noconfirm --needed -S ntfs-3g
-
-	message "Installing unrar"
-	pacman --noconfirm --needed -S unrar
+# Declare an array of string with type
+	declare -a AppArray=("open-vm-tools" \
+							"sudo" \
+							"curl" \
+							"ntfs" \
+							"unrar" \
+							"git")
 
 	# Iterate the string array using for loop
 	for app in ${AppArray[@]}; do
 		message "Installing $app..."
-		DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install $app
+		pacman --noconfirm --needed -S $app
 	done
 
 }
