@@ -93,20 +93,12 @@ function changeSources {
 
 function installUtilities {
 
-	message "Installing yay"
-	pacman --noconfirm --needed -S git
-	cd /opt
-	git clone https://aur.archlinux.org/yay-git.git
-	chown -R beheer:beheer ./yay-git
-	ls -al
-	cd yay-git/
-	makepkg -si
-
-# Declare an array of string with type
+	# Declare an array of string with type
 	declare -a AppArray=("open-vm-tools" \
 							"sudo" \
 							"curl" \
 							"openssh" \
+							"nano" \
 							"ntfs" \
 							"unrar" \
 							"git")
@@ -116,6 +108,14 @@ function installUtilities {
 		message "Installing $app..."
 		pacman --noconfirm --needed -S $app
 	done
+
+	message "Installing yay"
+	cd /opt
+	git clone https://aur.archlinux.org/yay-git.git
+	chown -R beheer:beheer ./yay-git
+	ls -al
+	cd yay-git/
+	makepkg -si
 
 	# Starting and enable SSH
 	systemctl enable sshd
