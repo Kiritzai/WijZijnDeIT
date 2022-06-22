@@ -70,7 +70,7 @@ function message {
 main () {
 	changeSources
 	installUtilities
-	fixCache
+	fixCache	
 	#setSudo
 	#changeGrub
     #disableWrites
