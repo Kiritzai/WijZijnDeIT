@@ -69,8 +69,6 @@ do
 	esac
 done
 
-echo $branch
-
 ############################
 ## Log Settings
 ############################
@@ -86,7 +84,11 @@ function message {
     echo -e "${logdate} :: ${GREEN}#${RESET} $1" | tee /dev/fd/3
 }
 
-
+#
+#
+#
+#
+#
 
 main () {
 	changeSources
