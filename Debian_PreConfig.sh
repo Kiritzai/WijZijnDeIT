@@ -50,6 +50,27 @@ read -s -p $'\tPress enter to continue...\n' -n 1 -r
 clear
 echo "$BANNER"
 
+PS3='Select your Debian branch: '
+branches=("Stable" "Testing" "Unstable")
+
+select branch in "${branches[@]}"
+do
+	case $branch in
+		"Stable")
+			break
+			;;
+		"Testing")
+			break
+            ;;
+		"Unstable")
+			break
+			;;
+		*) echo "invalid option $REPLY";;
+	esac
+done
+
+echo $branch
+
 ############################
 ## Log Settings
 ############################
@@ -87,12 +108,12 @@ function changeSources {
 	rm /etc/apt/sources.list
 
 	message "Creating sources.list..."
-	echo "deb http://ftp.debian.org/debian/ stable contrib main non-free" | tee /etc/apt/sources.list
-	echo "deb-src http://ftp.debian.org/debian/ stable contrib main non-free" | tee -a /etc/apt/sources.list
-	echo "deb http://security.debian.org/debian-security stable-security contrib main non-free" | tee -a /etc/apt/sources.list
-	echo "deb-src http://security.debian.org/debian-security stable-security contrib main non-free" | tee -a /etc/apt/sources.list
-	echo "deb http://ftp.debian.org/debian/ stable-updates contrib main non-free" | tee -a /etc/apt/sources.list
-	echo "deb-src http://ftp.debian.org/debian/ stable-updates contrib main non-free" | tee -a /etc/apt/sources.list
+	echo "deb http://ftp.debian.org/debian/ ${branch} contrib main non-free" | tee /etc/apt/sources.list
+	echo "deb-src http://ftp.debian.org/debian/ ${branch} contrib main non-free" | tee -a /etc/apt/sources.list
+	echo "deb http://security.debian.org/debian-security ${branch}-security contrib main non-free" | tee -a /etc/apt/sources.list
+	echo "deb-src http://security.debian.org/debian-security ${branch}-security contrib main non-free" | tee -a /etc/apt/sources.list
+	echo "deb http://ftp.debian.org/debian/ ${branch}-updates contrib main non-free" | tee -a /etc/apt/sources.list
+	echo "deb-src http://ftp.debian.org/debian/ ${branch}-updates contrib main non-free" | tee -a /etc/apt/sources.list
 	
 	message "Running apt-get update..."
 	DEBIAN_FRONTEND=noninteractive apt -yqq update
