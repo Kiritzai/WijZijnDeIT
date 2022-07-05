@@ -84,12 +84,6 @@ function message {
     echo -e "${logdate} :: ${GREEN}#${RESET} $1" | tee /dev/fd/3
 }
 
-#
-#
-#
-#
-#
-
 main () {
 	changeSources
 	installUtilities
