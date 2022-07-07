@@ -51,18 +51,18 @@ clear
 echo "$BANNER"
 
 PS3='Select your Debian branch: '
-branches=("Stable" "Testing" "Unstable")
+branches=("stable" "testing" "unstable")
 
 select branch in "${branches[@]}"
 do
 	case $branch in
-		"Stable")
+		"stable")
 			break
 			;;
-		"Testing")
+		"testing")
 			break
             ;;
-		"Unstable")
+		"unstable")
 			break
 			;;
 		*) echo "invalid option $REPLY";;
