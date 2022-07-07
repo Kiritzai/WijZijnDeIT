@@ -89,7 +89,7 @@ function installZabbixProxy {
 	# Installing Zabbix Repo
 	find / -type f -name "zabbix.list" -delete
 	wget https://repo.zabbix.com/zabbix/6.2/debian/pool/main/z/zabbix-release/zabbix-release_6.2-1+debian$(cut -d"." -f1 /etc/debian_version)_all.deb
-	dpkg -i zabbix-release_6.0-1+debian$(cut -d"." -f1 /etc/debian_version)_all.deb
+	dpkg -i zabbix-release_6.2-1+debian$(cut -d"." -f1 /etc/debian_version)_all.deb
 
 	# Updating repository
 	message "Running apt-get update..."
