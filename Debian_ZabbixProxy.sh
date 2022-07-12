@@ -86,6 +86,13 @@ main () {
 
 function installZabbixProxy {
 
+	# Stopping any running zabbix proxy
+	for zabbixService in $(systemctl --type=service --state=running | awk '/zabbix/ {print $1}')
+	do
+		systemctl kill $zabbixService
+		systemctl stop $zabbixService
+	done
+
 	# Installing Zabbix Repo
 	find / -type f -name "zabbix.db" -delete
 	find / -type f -name "zabbix*.list" -delete
