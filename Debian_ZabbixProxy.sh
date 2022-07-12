@@ -86,7 +86,8 @@ main () {
 
 function installZabbixProxy {
 
-	# Stopping any running zabbix proxy
+	# Stopping any running zabbix services
+	message "Stopping any running zabbix services..."
 	for zabbixService in $(systemctl --type=service --state=running | awk '/zabbix/ {print $1}')
 	do
 		systemctl kill $zabbixService
@@ -94,6 +95,7 @@ function installZabbixProxy {
 	done
 
 	# Installing Zabbix Repo
+	message "Installing Zabbix Repo..."
 	find / -type f -name "zabbix.db" -delete
 	find / -type f -name "zabbix*.list" -delete
 	wget https://repo.zabbix.com/zabbix/6.2/debian/pool/main/z/zabbix-release/zabbix-release_6.2-1+debian11_all.deb
