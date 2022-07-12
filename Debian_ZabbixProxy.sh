@@ -88,7 +88,7 @@ function installZabbixProxy {
 
 	# Installing Zabbix Repo
 	find / -type f -name "zabbix.db" -delete
-	find / -type f -name "zabbix.list" -delete
+	find / -type f -name "zabbix*.list" -delete
 	wget https://repo.zabbix.com/zabbix/6.2/debian/pool/main/z/zabbix-release/zabbix-release_6.2-1+debian11_all.deb
 	dpkg -i zabbix-release_6.2-1+debian11_all.deb
 
