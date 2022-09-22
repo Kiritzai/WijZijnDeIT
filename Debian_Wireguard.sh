@@ -73,6 +73,7 @@ function installUtilities {
 	done
 }
 
+
 function addClient {
 
 	echo
@@ -94,16 +95,28 @@ function addClient {
 	key=$(wg genkey)
 	psk=$(wg genpsk)
 
-	echo
-	echo "Provide IP route subnet [ex: 192.168.1.0/24]:"
-	read -p "IP: " ip_route_subnet
+	read -p $'\tDo you need to route network? (y/n): ' confirm
+	case $confirm in 
+		[yY] )
+			echo
+			echo "Provide IP route subnet [ex: 192.168.1.0/24]:"
+			read -p "IP: " ip_route_subnet
+			break
+		;;
+		[nN] )
+			break
+		;;
+		* )
+			echo invalid response
+		;;
+	esac
 
 	# Append peer
 echo -e "# BEGIN_PEER $client
 [Peer]
 PublicKey = $(wg pubkey <<< $key)
 PresharedKey = $psk
-AllowedIPs = 10.200.0.$octet/32, $ip_route_subnet
+AllowedIPs = 10.200.0.$octet/32$([[ -n "$ip_route_subnet" ]] && echo ", $ip_route_subnet")
 # END_PEER $client" | tee -a /etc/wireguard/wg0.conf
 
 	# Create client.conf file
@@ -114,7 +127,7 @@ PrivateKey = $key
 [Peer]
 PublicKey = $(grep PrivateKey /etc/wireguard/wg0.conf | cut -d " " -f 3 | wg pubkey)
 PresharedKey = $psk
-AllowedIPs = 10.200.0.0/24, $ip_route_subnet
+AllowedIPs = 10.200.0.0/24$([[ -n "$ip_route_subnet" ]] && echo ", $ip_route_subnet")
 Endpoint = vpn.wijzijnde.cloud:$(grep ListenPort /etc/wireguard/wg0.conf | cut -d " " -f 3)
 PersistentKeepalive = 25" | tee /etc/wireguard/wg0.conf
 
@@ -124,6 +137,8 @@ PersistentKeepalive = 25" | tee /etc/wireguard/wg0.conf
 	echo
 	echo "$client added. Configuration available in:" ~/"$client.conf"
 }
+
+
 
 function serverConfig {
 
@@ -157,17 +172,7 @@ PostDown = iptables -D FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACC
 PostDown = iptables -D INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 PostDown = iptables -D FORWARD -i wg0 -o wg0 -m conntrack --ctstate NEW -j ACCEPT
 PostDown = echo 0 > /proc/sys/net/ipv4/ip_forward
-PostDown = echo 0 > /proc/sys/net/ipv4/conf/all/proxy_arp
-
-#KDTelematica
-[Peer]
-PublicKey = saC3CKPX3zpVVNNvlhr6P3CsCn27zXqbDiFhK5SNgi0=
-AllowedIPs = 10.200.0.2/32, 192.168.1.0/24
-
-#KDTelematica Client
-[Peer]
-PublicKey = O+bKPw5zYMtpwQWX1oDsey2D5zt2BTgIS4jJeMJSyRk=
-AllowedIPs = 10.200.0.3/32" | tee /etc/wireguard/wg0.conf
+PostDown = echo 0 > /proc/sys/net/ipv4/conf/all/proxy_arp" | tee /etc/wireguard/wg0.conf
 			;;
 			2)
 			echo
@@ -204,18 +209,22 @@ PersistentKeepalive = 25" | tee /etc/wireguard/wg0.conf
 			;;
 	esac
 
-	message "Creating server config"
-
 	# Secure file
 	sudo chmod 600 /etc/wireguard/ -R
 
-
-	# ( To list rules : iptables -t nat -L -n -v )
+	# Start Wireguard + enable
+	systemctl start wg-quick@wg0.service
+	systemctl enable wg-quick@wg0.service
 
 	message "Finished!"
-	message "Connect with SoftEther Manager and create new soft adapter, then reboot"
 
 }
+
+
+
+####
+# STARTING PART
+####
 
 
 
@@ -267,6 +276,9 @@ EOF
 read -p $'\tCorrect? (Y/N): ' confirm && [[ $confirm == [yY] ]] || exit 1
 clear
 echo "$BANNER"
+
+
+
 
 ############################
 ## Log Settings
