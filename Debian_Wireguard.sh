@@ -237,7 +237,7 @@ echo "$BANNER"
 cat <<EOF
 
 	Local IP: ${ip}
-	Port: ${input_dns_server}
+	Port: ${port}
 	Endpoint: ${endpoint}
 
 	Are these settings correct?
