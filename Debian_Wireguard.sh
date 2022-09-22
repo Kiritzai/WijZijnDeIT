@@ -94,12 +94,16 @@ function addClient {
 	key=$(wg genkey)
 	psk=$(wg genpsk)
 
+	echo
+	echo "Provide IP route subnet [ex: 192.168.1.0/24]:"
+	read -p "IP: " ip_route_subnet
+
 	# Append peer
 echo -e "# BEGIN_PEER $client
 [Peer]
 PublicKey = $(wg pubkey <<< $key)
 PresharedKey = $psk
-AllowedIPs = 10.200.0.$octet/32
+AllowedIPs = 10.200.0.$octet/32, $ip_route_subnet
 # END_PEER $client" | tee -a /etc/wireguard/wg0.conf
 
 	# Create client.conf file
@@ -110,7 +114,7 @@ PrivateKey = $key
 [Peer]
 PublicKey = $(grep PrivateKey /etc/wireguard/wg0.conf | cut -d " " -f 3 | wg pubkey)
 PresharedKey = $psk
-AllowedIPs = 10.200.0.0/24
+AllowedIPs = 10.200.0.0/24, $ip_route_subnet
 Endpoint = vpn.wijzijnde.cloud:$(grep ListenPort /etc/wireguard/wg0.conf | cut -d " " -f 3)
 PersistentKeepalive = 25" | tee /etc/wireguard/wg0.conf
 
