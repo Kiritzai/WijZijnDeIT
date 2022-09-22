@@ -226,48 +226,19 @@ PersistentKeepalive = 25" | tee /etc/wireguard/wg0.conf
 # STARTING PART
 ####
 
-
-
-# DNS Server
-clear
-echo "$BANNER"
-cat <<EOF
-
-	Enter IP Address for local DNS server
- 
-EOF
-read -p $'\tDNS: ' input_dns_server < /dev/tty
-
-
-# Route
-clear
-echo "$BANNER"
-cat <<EOF
-
-	Enter IP route
-	
-	Example: [iprange/subnet,gateway]
-	Example: 10.10.0.0/16,10.10.10.1
-
-	For multiple routs
-	Example: 10.10.0.0/16,10.10.10.1,192.168.30.0/24,10.10.10.1
- 
-EOF
-read -p $'\tRoute: ' input_ip_route < /dev/tty
-
 endpoint="vpn.wijzijnde.cloud"
 port="51820"
 ip=$(ip -4 addr | grep inet | grep -vE '127(\.[0-9]{1,3}){3}' | cut -d '/' -f 1 | grep -oE '[0-9]{1,3}(\.[0-9]{1,3}){3}')
+
 
 # Summary
 clear
 echo "$BANNER"
 cat <<EOF
 
-	DHCP Scope: ${ip}
-	DNS Server: ${input_dns_server}
-	IP Route: ${input_ip_route}
-	Gateway: ${input_gateway}
+	Local IP: ${ip}
+	Port: ${input_dns_server}
+	Endpoint: ${endpoint}
 
 	Are these settings correct?
  
