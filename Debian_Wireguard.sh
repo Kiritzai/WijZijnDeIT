@@ -99,7 +99,6 @@ function addClient {
 			echo
 			echo $'\tProvide IP route subnet [ex: 192.168.1.0/24]:'
 			read -p $'\tSubnet: ' ip_route_subnet
-			break
 		;;
 		[nN] )
 			break
@@ -134,8 +133,82 @@ PersistentKeepalive = 25" | tee ~/"$client.conf"
 	echo -e '\xE2\x86\x91 That is a QR code containing your client configuration.'
 	echo
 	echo "$client added. Configuration available in:" ~/"$client.conf"
+
+	# Restarting Wireguard
+	systemctl start wg-quick@wg0.service
 }
 
+
+function addPeer {
+
+	key=$(wg genkey)
+	psk=$(wg genpsk)
+	pub=$(wg pubkey <<< $key)
+
+	echo 
+	read -p $'\tProvide a name for the peer: ' unsanitized_peer < /dev/tty
+	echo
+	read -p $'\tEnter Interface address of the peer server: ' peer_ip < /dev/tty
+	echo
+	read -p $'\tEnter local IP of Endpoint server: ' endpoint_local_ip < /dev/tty
+	echo
+	read -p $'\tEnter Endpoint public key: ' endpoint_public_key < /dev/tty
+	echo
+	read -p $'\tDo you need to route network? (y/n): ' confirm
+	case $confirm in 
+		[yY] )
+			echo
+			read -p $'\tProvide IP route subnet [ex: 192.168.1.0/24]: ' ip_route_subnet
+		;;
+		[nN] )
+			break
+		;;
+		* )
+			echo invalid response
+		;;
+	esac
+
+	# Creating peer configuration
+echo -e "# PEER
+[Interface]
+Address = ${peer_ip}/32
+PrivateKey = $(key)
+PostUp = echo 1 > /proc/sys/net/ipv4/ip_forward
+PostUp = echo 1 > /proc/sys/net/ipv4/conf/all/proxy_arp
+PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o ens192 -j MASQUERADE
+PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o ens192 -j MASQUERADE
+PostDown = echo 0 > /proc/sys/net/ipv4/ip_forward
+PostDown = echo 0 > /proc/sys/net/ipv4/conf/all/proxy_arp
+
+[Peer]
+PublicKey = ${endpoint_public_key}
+AllowedIPs = 10.200.0.1/32, ${endpoint_local_ip}/32
+Endpoint = ${endpoint}:${port}
+PersistentKeepalive = 25" | tee /etc/wireguard/wg0.conf
+
+	# Allow a limited set of characters to avoid conflicts
+	peer=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-]/_/g' <<< "$unsanitized_peer")
+	while [[ -z "$peer" ]] || grep -q "^# BEGIN_PEER $peer$" /etc/wireguard/wg0.conf; do
+		echo "$peer: invalid name."
+		read -p "Name: " unsanitized_peer
+		peer=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-]/_/g' <<< "$unsanitized_peer")
+	done
+
+	# Append peer
+echo -e "# BEGIN_PEER $peer
+[Peer]
+PublicKey = $pub
+PresharedKey = $psk
+AllowedIPs = 10.200.0.$octet/32$([[ -n "$ip_route_subnet" ]] && echo ", $ip_route_subnet")
+# END_PEER $peer" | tee -a /etc/wireguard/wg0.conf
+
+	wg addconf wg0 <(sed -n "/^# BEGIN_PEER $peer/,/^# END_PEER $peer/p" /etc/wireguard/wg0.conf)
+	echo
+	echo "$peer added. Configuration available in:" ~/"$peer.conf"
+
+	# Restarting Wireguard
+	systemctl restart wg-quick@wg0.service
+}
 
 
 function serverConfig {
@@ -173,34 +246,7 @@ PostDown = echo 0 > /proc/sys/net/ipv4/ip_forward
 PostDown = echo 0 > /proc/sys/net/ipv4/conf/all/proxy_arp" | tee /etc/wireguard/wg0.conf
 			;;
 			2)
-			echo
-			echo "Enter Interface address of the peer server:"
-			read -p $'\tPeer IP: ' peer_ip < /dev/tty
-
-			echo
-			echo "Enter local IP of Endpoint server:"
-			read -p $'\tEndpoint Local IP: ' endpoint_local_ip < /dev/tty
-
-			echo
-			echo "Enter Endpoint public key"
-			read -p $'\tEndpoint public key: ' endpoint_public_key < /dev/tty
-
-echo -e "# PEER
-[Interface]
-Address = ${peer_ip}/32
-PrivateKey = $(wg genkey)
-PostUp = echo 1 > /proc/sys/net/ipv4/ip_forward
-PostUp = echo 1 > /proc/sys/net/ipv4/conf/all/proxy_arp
-PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o ens192 -j MASQUERADE
-PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o ens192 -j MASQUERADE
-PostDown = echo 0 > /proc/sys/net/ipv4/ip_forward
-PostDown = echo 0 > /proc/sys/net/ipv4/conf/all/proxy_arp
-
-[Peer]
-PublicKey = ${endpoint_public_key}
-AllowedIPs = 10.200.0.1/32, ${endpoint_local_ip}/32
-Endpoint = ${endpoint}:${port}
-PersistentKeepalive = 25" | tee -a /etc/wireguard/wg0.conf
+				addPeer
 			;;
 			3)
 				exit
