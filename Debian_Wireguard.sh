@@ -98,7 +98,7 @@ function addClient {
 		[yY] )
 			echo
 			echo $'\tProvide IP route subnet [ex: 192.168.1.0/24]:'
-			read -p "Subnet: " ip_route_subnet
+			read -p $'\tSubnet: ' ip_route_subnet
 			break
 		;;
 		[nN] )
