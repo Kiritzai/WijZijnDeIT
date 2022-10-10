@@ -252,13 +252,15 @@ cat <<EOF
 	Are these settings correct?
  
 EOF
+	read -p $'\tCorrect? (Y/N): ' confirm && [[ $confirm == [yY] ]] || exit 1
+	clear
+	echo "$BANNER"
 
 	installUtilities
 	serverConfig
 else
-	read -p $'\tCorrect? (Y/N): ' confirm && [[ $confirm == [yY] ]] || exit 1
-	clear
-	echo "$BANNER"
+
+	
 
 	addClient
 fi
