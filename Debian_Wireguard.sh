@@ -256,22 +256,19 @@ echo "$BANNER"
 ############################
 
 # Log file
-logfile="$PWD/log.log"
+#logfile="$PWD/log.log"
 
 # Log execute
-exec 3>&1 1>>${logfile} 2>&1
+#exec 3>&1 1>>${logfile} 2>&1
 
 function message {
 	logdate=$(date "+%d %b %Y %H:%M:%S")
-    echo -e "${logdate} :: ${GREEN}#${RESET} $1" | tee /dev/fd/3
+    echo -e "${logdate} :: ${GREEN}#${RESET} $1" #| tee /dev/fd/3
 }
 
 # Check if Wireguard if installed
 if [[ ! -e /etc/wireguard/wg0.conf ]]; then
 	installUtilities
-
-	exec &> 2>&1
-
 	serverConfig
 else
 	addClient
