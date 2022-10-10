@@ -125,7 +125,8 @@ function addClient {
 	done
 
 	# Append peer
-echo -e "# BEGIN_PEER $client
+echo -e "
+# BEGIN_PEER $client
 [Peer]
 PublicKey = $pub
 PresharedKey = $psk
