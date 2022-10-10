@@ -72,7 +72,7 @@ function installUtilities {
 		DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install $app
 	done
 }
-
+2
 
 function addClient {
 
@@ -177,15 +177,15 @@ PostDown = echo 0 > /proc/sys/net/ipv4/conf/all/proxy_arp" | tee /etc/wireguard/
 			2)
 			echo
 			echo "Enter Interface address of the peer server:"
-			read -p $'\tEndpoint IP: ' peer_ip < /dev/tty
+			read -p $'\tPeer IP: ' peer_ip < /dev/tty
 
 			echo
 			echo "Enter local IP of Endpoint server:"
-			read -p $'\tEndpoint IP: ' endpoint_local_ip < /dev/tty
+			read -p $'\tEndpoint Local IP: ' endpoint_local_ip < /dev/tty
 
 			echo
 			echo "Enter Endpoint public key"
-			read -p $'\tEndpoint IP: ' endpoint_public_key < /dev/tty
+			read -p $'\tEndpoint public key: ' endpoint_public_key < /dev/tty
 
 echo -e "# PEER
 [Interface]
@@ -213,8 +213,8 @@ PersistentKeepalive = 25" | tee /etc/wireguard/wg0.conf
 	sudo chmod 600 /etc/wireguard/ -R
 
 	# Start Wireguard + enable
-	systemctl start wg-quick@wg0.service
 	systemctl enable wg-quick@wg0.service
+	systemctl start wg-quick@wg0.service
 
 	message "Finished!"
 
