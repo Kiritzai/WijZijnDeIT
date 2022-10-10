@@ -76,9 +76,7 @@ function installUtilities {
 
 function addClient {
 
-	echo
-	echo "Provide a name for the client:"
-	read -p "Name: " unsanitized_client
+	read -p $'\tProvide a name for the client: '  unsanitized_client
 	# Allow a limited set of characters to avoid conflicts
 	client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-]/_/g' <<< "$unsanitized_client")
 	while [[ -z "$client" ]] || grep -q "^# BEGIN_PEER $client$" /etc/wireguard/wg0.conf; do
