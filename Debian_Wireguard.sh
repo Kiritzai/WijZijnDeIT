@@ -221,16 +221,17 @@ EOF
 
 function serverConfig {
 
-	echo "Install Endpoint or Peer"
+	echo 
+	echo $'\tInstall Endpoint or Peer'
 	echo
-	echo "Select an option:"
-	echo "   1) Endpoint"
-	echo "   2) Peer"
-	echo "   3) Exit"
-	read -p "Option: " option
+	echo $'\tSelect an option:'
+	echo $'\t   1) Endpoint'
+	echo $'\t   2) Peer'
+	echo $'\t   3) Exit'
+	read -p $'\tOption: ' option
 	until [[ "$option" =~ ^[1-3]$ ]]; do
 		echo "$option: invalid selection."
-		read -p "Option: " option
+		read -p $'\tOption: ' option
 	done
 
 	case "$option" in
@@ -289,7 +290,7 @@ function message {
 }
 
 
-# Check if Wireguard if installed
+# Check if Wireguard is installed
 if [[ ! -e /etc/wireguard/wg0.conf ]]; then
 
 	# Summary
@@ -309,6 +310,10 @@ EOF
 	echo "$BANNER"
 
 	installUtilities
+
+	clear
+	echo "$BANNER"
+
 	serverConfig
 else
 	clear
