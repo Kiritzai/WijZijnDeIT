@@ -203,7 +203,6 @@ PresharedKey = $psk
 AllowedIPs = $peer_ip/32$([[ -n "$ip_route_subnet" ]] && echo ", $ip_route_subnet")
 # END_PEER $peer" | tee ~/"$peer.conf"
 
-	wg addconf wg0 <(sed -n "/^# BEGIN_PEER $peer/,/^# END_PEER $peer/p" /etc/wireguard/wg0.conf)
 	clear
 	echo "$BANNER"
 cat <<EOF
