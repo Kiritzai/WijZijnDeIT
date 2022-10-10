@@ -100,7 +100,7 @@ function addClient {
 		[yY] )
 			echo
 			echo "Provide IP route subnet [ex: 192.168.1.0/24]:"
-			read -p "IP: " ip_route_subnet
+			read -p "Subnet: " ip_route_subnet
 			break
 		;;
 		[nN] )
@@ -202,7 +202,7 @@ PostDown = echo 0 > /proc/sys/net/ipv4/conf/all/proxy_arp
 PublicKey = ${endpoint_public_key}
 AllowedIPs = 10.200.0.1/32, ${endpoint_local_ip}/32
 Endpoint = ${endpoint}:${port}
-PersistentKeepalive = 25" | tee /etc/wireguard/wg0.conf
+PersistentKeepalive = 25" | tee -a /etc/wireguard/wg0.conf
 			;;
 			3)
 				exit
