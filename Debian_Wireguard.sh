@@ -76,7 +76,41 @@ function installUtilities {
 
 function addClient {
 
-	read -p $'\tProvide a name for the client: '  unsanitized_client
+	key=$(wg genkey)
+	psk=$(wg genpsk)
+	pub=$(wg pubkey <<< $key)
+
+	echo 
+	read -p $'\tProvide a name for the client: ' unsanitized_client < /dev/tty
+	echo
+	read -p $'\tDo you need to route network? (y/n): ' confirm
+	case $confirm in 
+		[yY] )
+			echo
+			read -p $'\tProvide IP route subnet [ex: 192.168.1.0/24]: ' ip_route_subnet
+		;;
+		[nN] )
+			break
+		;;
+		* )
+			echo invalid response
+		;;
+	esac
+	echo
+	read -p $'\tDo you need to add DNS? (y/n): ' confirm
+	case $confirm in 
+		[yY] )
+			echo
+			read -p $'\tProvide DNS server [ex: 192.168.1.31]: ' dns
+		;;
+		[nN] )
+			break
+		;;
+		* )
+			echo invalid response
+		;;
+	esac
+
 	# Allow a limited set of characters to avoid conflicts
 	client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-]/_/g' <<< "$unsanitized_client")
 	while [[ -z "$client" ]] || grep -q "^# BEGIN_PEER $client$" /etc/wireguard/wg0.conf; do
@@ -90,28 +124,10 @@ function addClient {
 		(( octet++ ))
 	done
 
-	key=$(wg genkey)
-	psk=$(wg genpsk)
-
-	read -p $'\tDo you need to route network? (y/n): ' confirm
-	case $confirm in 
-		[yY] )
-			echo
-			echo $'\tProvide IP route subnet [ex: 192.168.1.0/24]:'
-			read -p $'\tSubnet: ' ip_route_subnet
-		;;
-		[nN] )
-			break
-		;;
-		* )
-			echo invalid response
-		;;
-	esac
-
 	# Append peer
 echo -e "# BEGIN_PEER $client
 [Peer]
-PublicKey = $(wg pubkey <<< $key)
+PublicKey = $pub
 PresharedKey = $psk
 AllowedIPs = 10.200.0.$octet/32$([[ -n "$ip_route_subnet" ]] && echo ", $ip_route_subnet")
 # END_PEER $client" | tee -a /etc/wireguard/wg0.conf
@@ -121,6 +137,7 @@ echo -e "[Interface]
 Address = 10.200.0.$octet/32
 DNS = $dns
 PrivateKey = $key
+
 [Peer]
 PublicKey = $(grep PrivateKey /etc/wireguard/wg0.conf | cut -d " " -f 3 | wg pubkey)
 PresharedKey = $psk
@@ -210,7 +227,7 @@ cat <<EOF
 	"${peer} added. Configuration available in:" ~/"${peer}.conf"
 	Add this to the Endpoint
 
-	$(cat ~/"${peer}.conf")
+$(cat ~/"${peer}.conf")
 
 EOF
 
