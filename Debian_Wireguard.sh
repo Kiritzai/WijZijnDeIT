@@ -231,9 +231,18 @@ port="51820"
 ip=$(ip -4 addr | grep inet | grep -vE '127(\.[0-9]{1,3}){3}' | cut -d '/' -f 1 | grep -oE '[0-9]{1,3}(\.[0-9]{1,3}){3}')
 
 
-# Summary
-clear
-echo "$BANNER"
+function message {
+	logdate=$(date "+%d %b %Y %H:%M:%S")
+    echo -e "${logdate} :: ${GREEN}#${RESET} $1" #| tee /dev/fd/3
+}
+
+
+# Check if Wireguard if installed
+if [[ ! -e /etc/wireguard/wg0.conf ]]; then
+
+	# Summary
+	clear
+	echo "$BANNER"
 cat <<EOF
 
 	Local IP: ${ip}
@@ -244,11 +253,15 @@ cat <<EOF
  
 EOF
 
-read -p $'\tCorrect? (Y/N): ' confirm && [[ $confirm == [yY] ]] || exit 1
-clear
-echo "$BANNER"
+	installUtilities
+	serverConfig
+else
+	read -p $'\tCorrect? (Y/N): ' confirm && [[ $confirm == [yY] ]] || exit 1
+	clear
+	echo "$BANNER"
 
-
+	addClient
+fi
 
 
 ############################
@@ -260,19 +273,6 @@ echo "$BANNER"
 
 # Log execute
 #exec 3>&1 1>>${logfile} 2>&1
-
-function message {
-	logdate=$(date "+%d %b %Y %H:%M:%S")
-    echo -e "${logdate} :: ${GREEN}#${RESET} $1" #| tee /dev/fd/3
-}
-
-# Check if Wireguard if installed
-if [[ ! -e /etc/wireguard/wg0.conf ]]; then
-	installUtilities
-	serverConfig
-else
-	addClient
-fi
 
 #main
 #reboot
