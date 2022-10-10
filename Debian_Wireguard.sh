@@ -182,6 +182,7 @@ PostDown = echo 0 > /proc/sys/net/ipv4/conf/all/proxy_arp
 
 [Peer]
 PublicKey = ${endpoint_public_key}
+PresharedKey = ${psk}
 AllowedIPs = 10.200.0.1/32, ${endpoint_local_ip}/32
 Endpoint = ${endpoint}:${port}
 PersistentKeepalive = 25" | tee /etc/wireguard/wg0.conf
@@ -194,13 +195,13 @@ PersistentKeepalive = 25" | tee /etc/wireguard/wg0.conf
 		peer=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-]/_/g' <<< "$unsanitized_peer")
 	done
 
-	# Append peer
+	# Create Config
 echo -e "# BEGIN_PEER $peer
 [Peer]
 PublicKey = $pub
 PresharedKey = $psk
 AllowedIPs = $peer_ip/32$([[ -n "$ip_route_subnet" ]] && echo ", $ip_route_subnet")
-# END_PEER $peer" | tee -a /etc/wireguard/wg0.conf
+# END_PEER $peer" | tee ~/"$peer.conf"
 
 	wg addconf wg0 <(sed -n "/^# BEGIN_PEER $peer/,/^# END_PEER $peer/p" /etc/wireguard/wg0.conf)
 	clear
