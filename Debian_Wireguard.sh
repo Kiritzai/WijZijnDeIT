@@ -129,7 +129,7 @@ PublicKey = $(grep PrivateKey /etc/wireguard/wg0.conf | cut -d " " -f 3 | wg pub
 PresharedKey = $psk
 AllowedIPs = 10.200.0.0/24$([[ -n "$ip_route_subnet" ]] && echo ", $ip_route_subnet")
 Endpoint = vpn.wijzijnde.cloud:$(grep ListenPort /etc/wireguard/wg0.conf | cut -d " " -f 3)
-PersistentKeepalive = 25" | tee /etc/wireguard/wg0.conf
+PersistentKeepalive = 25" | tee ~/"$client.conf"
 
 	wg addconf wg0 <(sed -n "/^# BEGIN_PEER $client/,/^# END_PEER $client/p" /etc/wireguard/wg0.conf)
 	qrencode -t UTF8 < ~/"$client.conf"
