@@ -259,9 +259,13 @@ EOF
 	installUtilities
 	serverConfig
 else
+	clear
+	echo "$BANNER"
+cat <<EOF
 
-	
-
+	Wireguard is already installed
+ 
+EOF
 	addClient
 fi
 
