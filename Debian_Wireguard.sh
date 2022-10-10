@@ -148,9 +148,9 @@ function addPeer {
 	echo 
 	read -p $'\tProvide a name for the peer: ' unsanitized_peer < /dev/tty
 	echo
-	read -p $'\tEnter Interface address of the peer server: ' peer_ip < /dev/tty
+	read -p $'\tEnter Interface address of the peer server [ex: 10.200.0.X]: ' peer_ip < /dev/tty
 	echo
-	read -p $'\tEnter local IP of Endpoint server: ' endpoint_local_ip < /dev/tty
+	read -p $'\tEnter local IP of Endpoint server [ex: 10.30.31.X]: ' endpoint_local_ip < /dev/tty
 	echo
 	read -p $'\tEnter Endpoint public key: ' endpoint_public_key < /dev/tty
 	echo
@@ -199,7 +199,7 @@ echo -e "# BEGIN_PEER $peer
 [Peer]
 PublicKey = $pub
 PresharedKey = $psk
-AllowedIPs = 10.200.0.1/32$([[ -n "$ip_route_subnet" ]] && echo ", $ip_route_subnet")
+AllowedIPs = $peer_ip/32$([[ -n "$ip_route_subnet" ]] && echo ", $ip_route_subnet")
 # END_PEER $peer" | tee -a /etc/wireguard/wg0.conf
 
 	wg addconf wg0 <(sed -n "/^# BEGIN_PEER $peer/,/^# END_PEER $peer/p" /etc/wireguard/wg0.conf)
@@ -209,7 +209,9 @@ cat <<EOF
 
 	"${peer} added. Configuration available in:" ~/"${peer}.conf"
 	Add this to the Endpoint
- 
+
+	$(cat ~/"${peer}.conf")
+
 EOF
 
 	# Restarting Wireguard
