@@ -269,6 +269,9 @@ function message {
 # Check if Wireguard if installed
 if [[ ! -e /etc/wireguard/wg0.conf ]]; then
 	installUtilities
+
+	exec &> 2>&1
+
 	serverConfig
 else
 	addClient
