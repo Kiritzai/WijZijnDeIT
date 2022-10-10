@@ -172,7 +172,7 @@ function addPeer {
 echo -e "# PEER
 [Interface]
 Address = ${peer_ip}/32
-PrivateKey = $(key)
+PrivateKey = ${key}
 PostUp = echo 1 > /proc/sys/net/ipv4/ip_forward
 PostUp = echo 1 > /proc/sys/net/ipv4/conf/all/proxy_arp
 PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o ens192 -j MASQUERADE
@@ -199,12 +199,18 @@ echo -e "# BEGIN_PEER $peer
 [Peer]
 PublicKey = $pub
 PresharedKey = $psk
-AllowedIPs = 10.200.0.$octet/32$([[ -n "$ip_route_subnet" ]] && echo ", $ip_route_subnet")
+AllowedIPs = 10.200.0.1/32$([[ -n "$ip_route_subnet" ]] && echo ", $ip_route_subnet")
 # END_PEER $peer" | tee -a /etc/wireguard/wg0.conf
 
 	wg addconf wg0 <(sed -n "/^# BEGIN_PEER $peer/,/^# END_PEER $peer/p" /etc/wireguard/wg0.conf)
-	echo
-	echo "$peer added. Configuration available in:" ~/"$peer.conf"
+	clear
+	echo "$BANNER"
+cat <<EOF
+
+	"${peer} added. Configuration available in:" ~/"${peer}.conf"
+	Add this to the Endpoint
+ 
+EOF
 
 	# Restarting Wireguard
 	systemctl restart wg-quick@wg0.service
