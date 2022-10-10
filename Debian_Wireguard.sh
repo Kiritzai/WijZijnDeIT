@@ -97,7 +97,7 @@ function addClient {
 	case $confirm in 
 		[yY] )
 			echo
-			echo "Provide IP route subnet [ex: 192.168.1.0/24]:"
+			echo $'\tProvide IP route subnet [ex: 192.168.1.0/24]:'
 			read -p "Subnet: " ip_route_subnet
 			break
 		;;
