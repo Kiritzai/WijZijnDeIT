@@ -168,8 +168,6 @@ function addPeer {
 	echo
 	read -p $'\tEnter Interface address of the peer server [ex: 10.200.0.X]: ' peer_ip < /dev/tty
 	echo
-	read -p $'\tEnter local IP of Endpoint server [ex: 10.30.31.X]: ' endpoint_local_ip < /dev/tty
-	echo
 	read -p $'\tEnter Endpoint public key: ' endpoint_public_key < /dev/tty
 	echo
 	read -p $'\tDo you need to route network? (y/n): ' confirm
@@ -201,7 +199,7 @@ PostDown = echo 0 > /proc/sys/net/ipv4/conf/all/proxy_arp
 [Peer]
 PublicKey = ${endpoint_public_key}
 PresharedKey = ${psk}
-AllowedIPs = 10.200.0.1/32, ${endpoint_local_ip}/32
+AllowedIPs = 10.200.0.1/24
 Endpoint = ${endpoint}:${port}
 PersistentKeepalive = 25" | tee /etc/wireguard/wg0.conf
 
