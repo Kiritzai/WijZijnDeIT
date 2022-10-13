@@ -102,6 +102,7 @@ function installWireguard {
 
 	case "$option" in
 			1)
+				echo $OPTION_PEER
 				[[ $OPTION_PEER -eq 1 ]] && OPTION_PEER=1
 				;;
 			2)
