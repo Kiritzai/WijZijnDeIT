@@ -18,7 +18,7 @@ endpoint="vpn.wijzijnde.cloud"
 port="51820"
 ip=$(ip -4 addr | grep inet | grep -vE '127(\.[0-9]{1,3}){3}' | cut -d '/' -f 1 | grep -oE '[0-9]{1,3}(\.[0-9]{1,3}){3}')
 
-VERSION="0.2"
+VERSION="0.3"
 INSTALLED=0
 OPTION_PEER=0
 OPTION_ENDPOINT=0
@@ -205,6 +205,9 @@ function addClient {
 		client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-]/_/g' <<< "$unsanitized_client")
 	done
 
+	# Adds CLIENT to the end
+	client="${client}_CLIENT"
+
 	octet=2
 	while grep AllowedIPs /etc/wireguard/wg0.conf | cut -d "." -f 4 | cut -d "/" -f 1 | grep -q "$octet"; do
 		(( octet++ ))
@@ -216,7 +219,7 @@ echo -e "
 [Peer]
 PublicKey = $pub
 PresharedKey = $psk
-AllowedIPs = 10.200.0.$octet/32$([[ -n "$ip_route_subnet" ]] && echo ", $ip_route_subnet")
+AllowedIPs = 10.200.0.$octet/32
 # END_PEER $client" | tee -a /etc/wireguard/wg0.conf
 
 	# Create client.conf file
@@ -237,6 +240,8 @@ PersistentKeepalive = 25" | tee ~/"$client.conf"
 	echo -e '\xE2\x86\x91 That is a QR code containing your client configuration.'
 	echo
 	echo "$client added. Configuration available in:" ~/"$client.conf"
+	echo
+	echo "Change [AllowedIPs = 10.200.0.1/24] to [AllowedIPs = 10.200.0.$octet/32] on the PEER for isolation"
 
 	# Restarting Wireguard
 	systemctl start wg-quick@wg0.service
@@ -251,10 +256,16 @@ function addPeer {
 
 	echo 
 	read -p $'\tProvide a name for the peer: ' unsanitized_peer < /dev/tty
+	clear
+	echo "$BANNER"
 	echo
 	read -p $'\tEnter Interface address of the peer server [ex: 10.200.0.X]: ' peer_ip < /dev/tty
+	clear
+	echo "$BANNER"
 	echo
 	read -p $'\tEnter Endpoint public key: ' endpoint_public_key < /dev/tty
+	clear
+	echo "$BANNER"
 	echo
 	read -p $'\tDo you need to route network? (y/n): ' confirm
 	case $confirm in 
@@ -302,7 +313,7 @@ echo -e "# BEGIN_PEER $peer
 [Peer]
 PublicKey = $pub
 PresharedKey = $psk
-AllowedIPs = $peer_ip/32$([[ -n "$ip_route_subnet" ]] && echo ", $ip_route_subnet")
+AllowedIPs = $([[ -n "$ip_route_subnet" ]] && echo ", $ip_route_subnet")
 # END_PEER $peer" | tee ~/"$peer.conf"
 
 	clear
