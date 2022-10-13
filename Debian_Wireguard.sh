@@ -18,6 +18,7 @@ endpoint="vpn.wijzijnde.cloud"
 port="51820"
 ip=$(ip -4 addr | grep inet | grep -vE '127(\.[0-9]{1,3}){3}' | cut -d '/' -f 1 | grep -oE '[0-9]{1,3}(\.[0-9]{1,3}){3}')
 
+VERSION="0.1"
 INSTALLED=0
 OPTION_PEER=0
 OPTION_ENDPOINT=0
@@ -46,7 +47,7 @@ BANNER=$(cat <<EOF
 	 \ \ /\ / /| || | / /| || | '_ \| | | |/ _ \  | |  | |
 	  \ V  V / | || |/ /_| || | | | | |_| |  __/_ | |  | |
 	   \_/\_/  |_|/ /____|_|/ |_| |_|____/ \___(_)___| |_|
-	            |__/      |__/    ${SOFTWARE} Installation
+	            |__/      |__/ ${SOFTWARE} V.${VERSION}
  
  
 EOF
@@ -61,24 +62,23 @@ function message {
 }
 
 
-
 function main {
 
 	checkInstallation
 
 	[[ $INSTALLED -eq 1 ]] && installWireguard || addClient
 
-	startup
-
-	[[ $OPTION_ENDPOINT -eq 1 ]] && installUtilities
+	[[ $OPTION_PEER -eq 1 ]] && addPeer
 	[[ $OPTION_ENDPOINT -eq 1 ]] && serverConfig
 
 	exit
 }
 
+
 function checkInstallation {
 	[[ -e /etc/wireguard/wg0.conf ]] && INSTALLED=1
 }
+
 
 function installWireguard {
 
@@ -125,7 +125,10 @@ function installWireguard {
 	clear
 	echo "$BANNER"
 
+	installUtilities
+
 }
+
 
 function installUtilities {
 
@@ -150,7 +153,7 @@ function installUtilities {
 		DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install $app
 	done
 }
-2
+
 
 function addClient {
 
@@ -320,21 +323,6 @@ EOF
 
 function serverConfig {
 
-	echo 
-	echo $'\tInstall Endpoint or Peer'
-	echo
-	echo $'\tSelect an option:'
-	echo $'\t   1) Endpoint'
-	echo $'\t   2) Peer'
-	echo $'\t   3) Exit'
-	read -p $'\tOption: ' option
-	until [[ "$option" =~ ^[1-3]$ ]]; do
-		echo "$option: invalid selection."
-		read -p $'\tOption: ' option
-	done
-
-	case "$option" in
-			1)
 echo -e "# ENDPOINT
 [Interface]
 Address = 10.200.0.1/24
@@ -352,14 +340,6 @@ PostDown = iptables -D INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEP
 PostDown = iptables -D FORWARD -i wg0 -o wg0 -m conntrack --ctstate NEW -j ACCEPT
 PostDown = echo 0 > /proc/sys/net/ipv4/ip_forward
 PostDown = echo 0 > /proc/sys/net/ipv4/conf/all/proxy_arp" | tee /etc/wireguard/wg0.conf
-			;;
-			2)
-				addPeer
-			;;
-			3)
-				exit
-			;;
-	esac
 
 	# Secure file
 	sudo chmod 600 /etc/wireguard/ -R
