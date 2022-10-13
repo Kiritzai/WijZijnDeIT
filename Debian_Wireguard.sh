@@ -13,7 +13,7 @@ set +H
 # Software
 SOFTWARE="Wireguard"
 
-VERSION="0.0.5"
+VERSION="0.0.8"
 ADAPTER="ens192"
 INSTALLED=0
 OPTION_PEER=0
@@ -255,6 +255,8 @@ function addPeer {
 	psk=$(wg genpsk)
 	pub=$(wg pubkey <<< $key)
 
+	clear
+	echo "$BANNER"
 	echo 
 	read -p $'\tProvide a name for the peer: ' unsanitized_peer < /dev/tty
 	clear
@@ -308,6 +310,9 @@ PersistentKeepalive = 25" | tee /etc/wireguard/wg0.conf
 		read -p "Name: " unsanitized_peer
 		peer=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-]/_/g' <<< "$unsanitized_peer")
 	done
+
+	# Adds CLIENT to the end
+	peer="${peer}_PEER"
 
 	# Create Config
 echo -e "# BEGIN_PEER $peer
