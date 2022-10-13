@@ -333,7 +333,7 @@ PostDown = /etc/wireguard/postdown.sh" | tee /etc/wireguard/wg0.conf
 
 
 # Post up
-echo -e "WIREGUARD_INTERFACE=wg0
+echo -e 'WIREGUARD_INTERFACE=wg0
 WIREGUARD_LAN=10.200.0.0/24
 MASQUERADE_INTERFACE=ens192
 
@@ -357,11 +357,11 @@ iptables -A $CHAIN_NAME -s $WIREGUARD_LAN -i $WIREGUARD_INTERFACE -j ACCEPT
 iptables -A $CHAIN_NAME -i $WIREGUARD_INTERFACE -j DROP
 
 # Return to FORWARD chain
-iptables -A $CHAIN_NAME -j RETURN" | tee /etc/wireguard/postup.sh
+iptables -A $CHAIN_NAME -j RETURN' | tee /etc/wireguard/postup.sh
 
 
 # Post down script
-echo -e "WIREGUARD_INTERFACE=wg0
+echo -e 'WIREGUARD_INTERFACE=wg0
 WIREGUARD_LAN=10.200.0.0/24
 MASQUERADE_INTERFACE=ens192
 CHAIN_NAME="WIREGUARD_$WIREGUARD_INTERFACE"
@@ -374,7 +374,7 @@ iptables -t nat -D POSTROUTING -o $MASQUERADE_INTERFACE -j MASQUERADE -s $WIREGU
 # Remove and delete the WIREGUARD_wg0 chain
 iptables -D FORWARD -j $CHAIN_NAME
 iptables -F $CHAIN_NAME
-iptables -X $CHAIN_NAME" | tee /etc/wireguard/postdown.sh
+iptables -X $CHAIN_NAME' | tee /etc/wireguard/postdown.sh
 
 	# Make post up/down executable
 	chmod +x /etc/wireguard/postup.sh
