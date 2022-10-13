@@ -18,7 +18,7 @@ endpoint="vpn.wijzijnde.cloud"
 port="51820"
 ip=$(ip -4 addr | grep inet | grep -vE '127(\.[0-9]{1,3}){3}' | cut -d '/' -f 1 | grep -oE '[0-9]{1,3}(\.[0-9]{1,3}){3}')
 
-VERSION="0.1"
+VERSION="0.2"
 INSTALLED=0
 OPTION_PEER=0
 OPTION_ENDPOINT=0
@@ -340,6 +340,49 @@ PostDown = iptables -D INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEP
 PostDown = iptables -D FORWARD -i wg0 -o wg0 -m conntrack --ctstate NEW -j ACCEPT
 PostDown = echo 0 > /proc/sys/net/ipv4/ip_forward
 PostDown = echo 0 > /proc/sys/net/ipv4/conf/all/proxy_arp" | tee /etc/wireguard/wg0.conf
+
+
+# Post up
+echo -e "WIREGUARD_INTERFACE=wg0
+WIREGUARD_LAN=10.200.0.0/24
+MASQUERADE_INTERFACE=ens192
+
+iptables -t nat -I POSTROUTING -o $MASQUERADE_INTERFACE -j MASQUERADE -s $WIREGUARD_LAN
+
+# Add a WIREGUARD_wg0 chain to the FORWARD chain
+CHAIN_NAME="WIREGUARD_$WIREGUARD_INTERFACE"
+iptables -N $CHAIN_NAME
+iptables -A FORWARD -j $CHAIN_NAME
+
+# Accept related or established traffic
+iptables -A $CHAIN_NAME -o $WIREGUARD_INTERFACE -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+
+# Accept traffic from any Wireguard IP address connected to the Wireguard server
+iptables -A $CHAIN_NAME -s $WIREGUARD_LAN -i $WIREGUARD_INTERFACE -j ACCEPT
+
+# Drop everything else coming through the Wireguard interface
+iptables -A $CHAIN_NAME -i $WIREGUARD_INTERFACE -j DROP
+
+# Return to FORWARD chain
+iptables -A $CHAIN_NAME -j RETURN" | tee /etc/wireguard/postup.sh
+
+
+# Post down script
+echo -e "WIREGUARD_INTERFACE=wg0
+WIREGUARD_LAN=10.200.0.0/24
+MASQUERADE_INTERFACE=ens192
+CHAIN_NAME="WIREGUARD_$WIREGUARD_INTERFACE"
+
+iptables -t nat -D POSTROUTING -o $MASQUERADE_INTERFACE -j MASQUERADE -s $WIREGUARD_LAN
+
+# Remove and delete the WIREGUARD_wg0 chain
+iptables -D FORWARD -j $CHAIN_NAME
+iptables -F $CHAIN_NAME
+iptables -X $CHAIN_NAME" | tee /etc/wireguard/postdown.sh
+
+	# Make post up/down executable
+	chmod +x /etc/wireguard/postup.sh
+	chmod +x /etc/wireguard/postdown.sh
 
 	# Secure file
 	sudo chmod 600 /etc/wireguard/ -R
