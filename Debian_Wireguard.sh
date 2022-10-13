@@ -13,7 +13,7 @@ set +H
 # Software
 SOFTWARE="Wireguard"
 
-VERSION="0.0.4"
+VERSION="0.0.5"
 ADAPTER="ens192"
 INSTALLED=0
 OPTION_PEER=0
@@ -102,12 +102,10 @@ function installWireguard {
 
 	case "$option" in
 			1)
-				echo $OPTION_PEER
-				[[ $OPTION_PEER -eq 1 ]] && OPTION_PEER=1
-				echo $OPTION_PEER
+				OPTION_PEER=1
 				;;
 			2)
-				[[ $OPTION_ENDPOINT -eq 1 ]] && OPTION_ENDPOINT=1
+				OPTION_ENDPOINT=1
 				;;
 			3)
 				exit
