@@ -6,7 +6,6 @@ set +H
 # bash <(wget --no-cache -O - https://github.com/Kiritzai/WijZijnDeIT/raw/master/Debian_Wireguard.sh)
 # curl -sSL https://github.com/Kiritzai/WijZijnDeIT/raw/master/Debian_Wireguard.sh | bash
 
-
 ################
 ## Parameters ##
 ################
