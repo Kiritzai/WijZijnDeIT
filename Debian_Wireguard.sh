@@ -328,24 +328,17 @@ echo -e "# ENDPOINT
 Address = 10.200.0.1/24
 ListenPort = ${port}
 PrivateKey = $(wg genkey)
-PostUp = echo 1 > /proc/sys/net/ipv4/ip_forward
-PostUp = echo 1 > /proc/sys/net/ipv4/conf/all/proxy_arp
-PostUp = ip rule add not from 10.200.0.0/24 table main
-PostUp = iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-PostUp = iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-PostUp = iptables -A FORWARD -i wg0 -o wg0 -m conntrack --ctstate NEW -j ACCEPT
-PostDown = ip rule del not from 10.200.0.0/24 table main
-PostDown = iptables -D FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-PostDown = iptables -D INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-PostDown = iptables -D FORWARD -i wg0 -o wg0 -m conntrack --ctstate NEW -j ACCEPT
-PostDown = echo 0 > /proc/sys/net/ipv4/ip_forward
-PostDown = echo 0 > /proc/sys/net/ipv4/conf/all/proxy_arp" | tee /etc/wireguard/wg0.conf
+PostUp = /etc/wireguard/postup.sh
+PostDown = /etc/wireguard/postdown.sh" | tee /etc/wireguard/wg0.conf
 
 
 # Post up
 echo -e "WIREGUARD_INTERFACE=wg0
 WIREGUARD_LAN=10.200.0.0/24
 MASQUERADE_INTERFACE=ens192
+
+echo 1 > /proc/sys/net/ipv4/ip_forward
+echo 1 > /proc/sys/net/ipv4/conf/all/proxy_arp
 
 iptables -t nat -I POSTROUTING -o $MASQUERADE_INTERFACE -j MASQUERADE -s $WIREGUARD_LAN
 
@@ -372,6 +365,9 @@ echo -e "WIREGUARD_INTERFACE=wg0
 WIREGUARD_LAN=10.200.0.0/24
 MASQUERADE_INTERFACE=ens192
 CHAIN_NAME="WIREGUARD_$WIREGUARD_INTERFACE"
+
+echo 0 > /proc/sys/net/ipv4/ip_forward
+echo 0 > /proc/sys/net/ipv4/conf/all/proxy_arp
 
 iptables -t nat -D POSTROUTING -o $MASQUERADE_INTERFACE -j MASQUERADE -s $WIREGUARD_LAN
 
