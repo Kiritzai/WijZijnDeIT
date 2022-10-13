@@ -13,14 +13,16 @@ set +H
 # Software
 SOFTWARE="Wireguard"
 
-endpoint="vpn.wijzijnde.cloud"
-port="51820"
-ip=$(ip -4 addr | grep inet | grep -vE '127(\.[0-9]{1,3}){3}' | cut -d '/' -f 1 | grep -oE '[0-9]{1,3}(\.[0-9]{1,3}){3}')
-
-VERSION="0.0.1"
+VERSION="0.0.3"
+ADAPTER="ens192"
 INSTALLED=0
 OPTION_PEER=0
 OPTION_ENDPOINT=0
+
+endpoint="vpn.wijzijnde.cloud"
+port="51820"
+local_ip=$(ip -4 addr | grep $ADAPTER | grep inet | grep -vE '127(\.[0-9]{1,3}){3}' | cut -d '/' -f 1 | grep -oE '[0-9]{1,3}(\.[0-9]{1,3}){3}')
+
 
 RESET='\033[0m'
 YELLOW='\033[1;33m'
@@ -111,7 +113,7 @@ function installWireguard {
 	esac
 
 	echo
-	echo $'\tLocal IP: '$ip
+	echo $'\tLocal IP: '$local_ip
 	echo $'\tPort: '$port
 	echo $'\tEndpoint: '$endpoint
 	echo
@@ -287,8 +289,8 @@ Address = ${peer_ip}/32
 PrivateKey = ${key}
 PostUp = echo 1 > /proc/sys/net/ipv4/ip_forward
 PostUp = echo 1 > /proc/sys/net/ipv4/conf/all/proxy_arp
-PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o ens192 -j MASQUERADE
-PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o ens192 -j MASQUERADE
+PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o ${ADAPTER} -j MASQUERADE
+PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o ${ADAPTER} -j MASQUERADE
 PostDown = echo 0 > /proc/sys/net/ipv4/ip_forward
 PostDown = echo 0 > /proc/sys/net/ipv4/conf/all/proxy_arp
 
