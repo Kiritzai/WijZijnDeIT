@@ -14,15 +14,20 @@ set +H
 # Software
 SOFTWARE="Wireguard"
 
+endpoint="vpn.wijzijnde.cloud"
+port="51820"
+ip=$(ip -4 addr | grep inet | grep -vE '127(\.[0-9]{1,3}){3}' | cut -d '/' -f 1 | grep -oE '[0-9]{1,3}(\.[0-9]{1,3}){3}')
+
+OPTION_PEER=0
+OPTION_ENDPOINT=0
+
 RESET='\033[0m'
 YELLOW='\033[1;33m'
-#GRAY='\033[0;37m'
-#WHITE='\033[1;37m'
 GRAY_R='\033[39m'
 WHITE_R='\033[39m'
-RED='\033[1;31m' # Light Red.
-GREEN='\033[1;32m' # Light Green.
-#BOLD='\e[1m'
+RED='\033[1;31m'
+GREEN='\033[1;32m'
+
 
 ##################
 ## Installation ##
@@ -48,6 +53,81 @@ EOF
 echo "$BANNER"
 read -s -p $'\tPress enter to continue...\n' -n 1 -r
 
+# Logging
+function message {
+	logdate=$(date "+%d %b %Y %H:%M:%S")
+    echo -e "${logdate} :: ${GREEN}#${RESET} $1" #| tee /dev/fd/3
+}
+
+
+
+function main {
+	startup
+
+	[[ $OPTION_ENDPOINT -eq 1 ]] && installUtilities
+	[[ $OPTION_ENDPOINT -eq 1 ]] && serverConfig
+
+	exit
+}
+
+function startup {
+
+	# Check if Wireguard is installed
+	if [[ ! -e /etc/wireguard/wg0.conf ]]; then
+
+		clear
+		echo "$BANNER"
+
+		echo 
+		echo $'\tInstall Endpoint or Peer'
+		echo
+		echo $'\tSelect an option:'
+		echo $'\t   1) Peer'
+		echo $'\t   2) Endpoint'
+		echo $'\t   3) Exit'
+		echo
+		read -p $'\tOption: ' option
+		until [[ "$option" =~ ^[1-3]$ ]]; do
+			echo "$option: invalid selection."
+			read -p $'\tOption: ' option
+		done
+
+		case "$option" in
+				1)
+					[[ $OPTION_PEER -eq 1 ]] && OPTION_PEER=1
+					;;
+				2)
+					[[ $OPTION_ENDPOINT -eq 1 ]] && OPTION_ENDPOINT=1
+					;;
+				3)
+					exit
+					;;
+		esac
+
+		echo
+		echo $'\tLocal IP: ${ip}'
+		echo $'\tPort: ${port}'
+		echo $'\tEndpoint: ${endpoint}'
+		echo
+		[[ $OPTION_PEER -eq 1 ]] && echo $'\tChoice: Peer'
+		[[ $OPTION_ENDPOINT -eq 1 ]] && echo $'\tChoice: Endpoint'
+		echo
+		echo $'\tAre these settings correct?'
+
+		read -p $'\tCorrect? (Y/N): ' confirm && [[ $confirm == [yY] ]] || exit 1
+		clear
+		echo "$BANNER"
+		
+	else
+		clear
+		echo "$BANNER"
+		echo
+		echo $'\tWireguard is already installed'
+
+		addClient
+	fi
+
+}
 
 function installUtilities {
 
@@ -289,69 +369,4 @@ PostDown = echo 0 > /proc/sys/net/ipv4/conf/all/proxy_arp" | tee /etc/wireguard/
 
 }
 
-
-
-####
-# STARTING PART
-####
-
-endpoint="vpn.wijzijnde.cloud"
-port="51820"
-ip=$(ip -4 addr | grep inet | grep -vE '127(\.[0-9]{1,3}){3}' | cut -d '/' -f 1 | grep -oE '[0-9]{1,3}(\.[0-9]{1,3}){3}')
-
-
-function message {
-	logdate=$(date "+%d %b %Y %H:%M:%S")
-    echo -e "${logdate} :: ${GREEN}#${RESET} $1" #| tee /dev/fd/3
-}
-
-
-# Check if Wireguard is installed
-if [[ ! -e /etc/wireguard/wg0.conf ]]; then
-
-	# Summary
-	clear
-	echo "$BANNER"
-cat <<EOF
-
-	Local IP: ${ip}
-	Port: ${port}
-	Endpoint: ${endpoint}
-
-	Are these settings correct?
- 
-EOF
-	read -p $'\tCorrect? (Y/N): ' confirm && [[ $confirm == [yY] ]] || exit 1
-	clear
-	echo "$BANNER"
-
-	installUtilities
-
-	clear
-	echo "$BANNER"
-
-	serverConfig
-else
-	clear
-	echo "$BANNER"
-cat <<EOF
-
-	Wireguard is already installed
- 
-EOF
-	addClient
-fi
-
-
-############################
-## Log Settings
-############################
-
-# Log file
-#logfile="$PWD/log.log"
-
-# Log execute
-#exec 3>&1 1>>${logfile} 2>&1
-
-#main
-#reboot
+main
