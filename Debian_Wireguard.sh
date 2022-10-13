@@ -18,7 +18,7 @@ endpoint="vpn.wijzijnde.cloud"
 port="51820"
 ip=$(ip -4 addr | grep inet | grep -vE '127(\.[0-9]{1,3}){3}' | cut -d '/' -f 1 | grep -oE '[0-9]{1,3}(\.[0-9]{1,3}){3}')
 
-VERSION="0.4"
+VERSION="0.0.1"
 INSTALLED=0
 OPTION_PEER=0
 OPTION_ENDPOINT=0
@@ -112,9 +112,9 @@ function installWireguard {
 	esac
 
 	echo
-	echo $'\tLocal IP: ${ip}'
-	echo $'\tPort: ${port}'
-	echo $'\tEndpoint: ${endpoint}'
+	echo $'\tLocal IP: '$ip
+	echo $'\tPort: '$port
+	echo $'\tEndpoint: '$endpoint
 	echo
 	[[ $OPTION_PEER -eq 1 ]] && echo $'\tChoice: Peer'
 	[[ $OPTION_ENDPOINT -eq 1 ]] && echo $'\tChoice: Endpoint'
