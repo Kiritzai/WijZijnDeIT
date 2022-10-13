@@ -18,7 +18,7 @@ endpoint="vpn.wijzijnde.cloud"
 port="51820"
 ip=$(ip -4 addr | grep inet | grep -vE '127(\.[0-9]{1,3}){3}' | cut -d '/' -f 1 | grep -oE '[0-9]{1,3}(\.[0-9]{1,3}){3}')
 
-VERSION="0.3"
+VERSION="0.4"
 INSTALLED=0
 OPTION_PEER=0
 OPTION_ENDPOINT=0
@@ -47,7 +47,7 @@ BANNER=$(cat <<EOF
 	 \ \ /\ / /| || | / /| || | '_ \| | | |/ _ \  | |  | |
 	  \ V  V / | || |/ /_| || | | | | |_| |  __/_ | |  | |
 	   \_/\_/  |_|/ /____|_|/ |_| |_|____/ \___(_)___| |_|
-	            |__/      |__/ ${SOFTWARE} V.${VERSION}
+	            |__/      |__/ ${SOFTWARE} v${VERSION}
  
  
 EOF
@@ -66,7 +66,7 @@ function main {
 
 	checkInstallation
 
-	[[ $INSTALLED -eq 1 ]] && installWireguard || addClient
+	[[ $INSTALLED -eq 0 ]] && installWireguard || addClient
 
 	[[ $OPTION_PEER -eq 1 ]] && addPeer
 	[[ $OPTION_ENDPOINT -eq 1 ]] && serverConfig
