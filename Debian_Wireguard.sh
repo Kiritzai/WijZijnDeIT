@@ -18,6 +18,7 @@ endpoint="vpn.wijzijnde.cloud"
 port="51820"
 ip=$(ip -4 addr | grep inet | grep -vE '127(\.[0-9]{1,3}){3}' | cut -d '/' -f 1 | grep -oE '[0-9]{1,3}(\.[0-9]{1,3}){3}')
 
+INSTALLED=0
 OPTION_PEER=0
 OPTION_ENDPOINT=0
 
@@ -62,6 +63,11 @@ function message {
 
 
 function main {
+
+	checkInstallation
+
+	[[ $INSTALLED -eq 1 ]] && installWireguard || addClient
+
 	startup
 
 	[[ $OPTION_ENDPOINT -eq 1 ]] && installUtilities
@@ -70,62 +76,54 @@ function main {
 	exit
 }
 
-function startup {
+function checkInstallation {
+	[[ -e /etc/wireguard/wg0.conf ]] && INSTALLED=1
+}
 
-	# Check if Wireguard is installed
-	if [[ ! -e /etc/wireguard/wg0.conf ]]; then
+function installWireguard {
 
-		clear
-		echo "$BANNER"
+	clear
+	echo "$BANNER"
 
-		echo 
-		echo $'\tInstall Endpoint or Peer'
-		echo
-		echo $'\tSelect an option:'
-		echo $'\t   1) Peer'
-		echo $'\t   2) Endpoint'
-		echo $'\t   3) Exit'
-		echo
+	echo 
+	echo $'\tInstall Endpoint or Peer'
+	echo
+	echo $'\tSelect an option:'
+	echo $'\t   1) Peer'
+	echo $'\t   2) Endpoint'
+	echo $'\t   3) Exit'
+	echo
+	read -p $'\tOption: ' option
+	until [[ "$option" =~ ^[1-3]$ ]]; do
+		echo "$option: invalid selection."
 		read -p $'\tOption: ' option
-		until [[ "$option" =~ ^[1-3]$ ]]; do
-			echo "$option: invalid selection."
-			read -p $'\tOption: ' option
-		done
+	done
 
-		case "$option" in
-				1)
-					[[ $OPTION_PEER -eq 1 ]] && OPTION_PEER=1
-					;;
-				2)
-					[[ $OPTION_ENDPOINT -eq 1 ]] && OPTION_ENDPOINT=1
-					;;
-				3)
-					exit
-					;;
-		esac
+	case "$option" in
+			1)
+				[[ $OPTION_PEER -eq 1 ]] && OPTION_PEER=1
+				;;
+			2)
+				[[ $OPTION_ENDPOINT -eq 1 ]] && OPTION_ENDPOINT=1
+				;;
+			3)
+				exit
+				;;
+	esac
 
-		echo
-		echo $'\tLocal IP: ${ip}'
-		echo $'\tPort: ${port}'
-		echo $'\tEndpoint: ${endpoint}'
-		echo
-		[[ $OPTION_PEER -eq 1 ]] && echo $'\tChoice: Peer'
-		[[ $OPTION_ENDPOINT -eq 1 ]] && echo $'\tChoice: Endpoint'
-		echo
-		echo $'\tAre these settings correct?'
+	echo
+	echo $'\tLocal IP: ${ip}'
+	echo $'\tPort: ${port}'
+	echo $'\tEndpoint: ${endpoint}'
+	echo
+	[[ $OPTION_PEER -eq 1 ]] && echo $'\tChoice: Peer'
+	[[ $OPTION_ENDPOINT -eq 1 ]] && echo $'\tChoice: Endpoint'
+	echo
+	echo $'\tAre these settings correct?'
 
-		read -p $'\tCorrect? (Y/N): ' confirm && [[ $confirm == [yY] ]] || exit 1
-		clear
-		echo "$BANNER"
-		
-	else
-		clear
-		echo "$BANNER"
-		echo
-		echo $'\tWireguard is already installed'
-
-		addClient
-	fi
+	read -p $'\tCorrect? (Y/N): ' confirm && [[ $confirm == [yY] ]] || exit 1
+	clear
+	echo "$BANNER"
 
 }
 
@@ -155,6 +153,11 @@ function installUtilities {
 2
 
 function addClient {
+
+	clear
+	echo "$BANNER"
+	echo
+	echo $'\tWireguard is already installed'
 
 	key=$(wg genkey)
 	psk=$(wg genpsk)
