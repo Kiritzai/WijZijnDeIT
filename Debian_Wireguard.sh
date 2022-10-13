@@ -228,6 +228,7 @@ echo -e "[Interface]
 Address = 10.200.0.$octet/32
 DNS = $dns
 PrivateKey = $key
+PostUp = powershell.exe -command \"Set-NetIPInterface -InterfaceAlias '%WIREGUARD_TUNNEL_NAME%' -InterfaceMetric 5000\"
 
 [Peer]
 PublicKey = $(grep PrivateKey /etc/wireguard/wg0.conf | cut -d " " -f 3 | wg pubkey)
