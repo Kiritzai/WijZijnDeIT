@@ -13,8 +13,8 @@ set +H
 # Software
 SOFTWARE="Wireguard"
 
-VERSION="0.0.8"
-ADAPTER="ens192"
+VERSION="0.0.9"
+ADAPTER=$(ip -br l | awk '$1 !~ "lo|vir|wl" { print $1}')
 INSTALLED=0
 OPTION_PEER=0
 OPTION_ENDPOINT=0
@@ -353,7 +353,7 @@ PostDown = /etc/wireguard/postdown.sh" | tee /etc/wireguard/wg0.conf
 # Post up
 echo -e 'WIREGUARD_INTERFACE=wg0
 WIREGUARD_LAN=10.200.0.0/24
-MASQUERADE_INTERFACE=ens192
+MASQUERADE_INTERFACE='${ADAPTER}'
 
 echo 1 > /proc/sys/net/ipv4/ip_forward
 echo 1 > /proc/sys/net/ipv4/conf/all/proxy_arp
@@ -381,7 +381,7 @@ iptables -A $CHAIN_NAME -j RETURN' | tee /etc/wireguard/postup.sh
 # Post down script
 echo -e 'WIREGUARD_INTERFACE=wg0
 WIREGUARD_LAN=10.200.0.0/24
-MASQUERADE_INTERFACE=ens192
+MASQUERADE_INTERFACE='${ADAPTER}'
 CHAIN_NAME="WIREGUARD_$WIREGUARD_INTERFACE"
 
 echo 0 > /proc/sys/net/ipv4/ip_forward
