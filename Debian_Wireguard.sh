@@ -13,8 +13,8 @@ set +H
 # Software
 SOFTWARE="Wireguard"
 
-VERSION="0.1.1"
-ADAPTER=$(ip -br l | awk '$1 !~ "lo|vir|wl" { print $1}')
+VERSION="0.1.2"
+ADAPTER=$(ip -br l | awk '$1 !~ "lo|vir|wl|tap" { print $1}')
 INSTALLED=0
 OPTION_PEER=0
 OPTION_ENDPOINT=0
