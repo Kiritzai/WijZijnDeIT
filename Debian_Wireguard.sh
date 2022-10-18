@@ -321,7 +321,7 @@ echo -e "# BEGIN_PEER $peer
 [Peer]
 PublicKey = $pub
 PresharedKey = $psk
-AllowedIPs = $([[ -n "$ip_route_subnet" ]] && echo ", $ip_route_subnet")
+AllowedIPs = $([[ -n "$ip_route_subnet" ]] && echo "$ip_route_subnet")
 # END_PEER $peer" | tee ~/"$peer.conf"
 
 	clear
