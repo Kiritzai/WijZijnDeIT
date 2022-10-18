@@ -13,7 +13,7 @@ set +H
 # Software
 SOFTWARE="Wireguard"
 
-VERSION="0.0.9"
+VERSION="0.1.0"
 ADAPTER=$(ip -br l | awk '$1 !~ "lo|vir|wl" { print $1}')
 INSTALLED=0
 OPTION_PEER=0
@@ -116,6 +116,7 @@ function installWireguard {
 	echo $'\tLocal IP: '$local_ip
 	echo $'\tPort: '$port
 	echo $'\tEndpoint: '$endpoint
+	echo $'\tAdapter: '$ADAPTER
 	echo
 	[[ $OPTION_PEER -eq 1 ]] && echo $'\tChoice: Peer'
 	[[ $OPTION_ENDPOINT -eq 1 ]] && echo $'\tChoice: Endpoint'
