@@ -13,7 +13,7 @@ set +H
 # Software
 SOFTWARE="Wireguard"
 
-VERSION="0.1.0"
+VERSION="0.1.1"
 ADAPTER=$(ip -br l | awk '$1 !~ "lo|vir|wl" { print $1}')
 INSTALLED=0
 OPTION_PEER=0
@@ -210,7 +210,7 @@ function addClient {
 	# Adds CLIENT to the end
 	client="${client}_CLIENT"
 
-	octet=2
+	octet=100
 	while grep AllowedIPs /etc/wireguard/wg0.conf | cut -d "." -f 4 | cut -d "/" -f 1 | grep -q "$octet"; do
 		(( octet++ ))
 	done
